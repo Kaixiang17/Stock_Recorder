@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trading Journal | 美股量化決策與歷史覆盤系統</title>
-    <!-- Tailwind CSS (樣式庫) -->
+    <title>Trading Journal | 美股歷史覆盤與趨勢決策系統</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- AOS CSS (滾動動畫庫) -->
+    <!-- AOS CSS -->
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <!-- FontAwesome 圖示庫 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -57,7 +57,7 @@
             width: 100%;
             overflow: hidden;
             background: rgba(11, 15, 23, 0.8);
-            border-y: 1px solid rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
         }
         .ticker-move {
             display: inline-flex;
@@ -74,17 +74,16 @@
 </head>
 <body class="antialiased bg-grid">
 
-    <!-- 1. 美股即時行情跑馬燈 (Tech Stock Ticker) -->
+    <!-- 1. 美股即時行情跑馬燈 -->
     <div class="ticker-wrap py-2.5 fixed top-0 w-full z-50 backdrop-blur-md">
         <div class="ticker-move text-xs font-mono tracking-wider">
-            <!-- 跑馬燈卡片項目 -->
             <span class="mx-6"><strong class="text-slate-300">NVDA</strong> <span class="text-emerald-400">▲ $128.50 (+3.42%)</span></span>
             <span class="mx-6"><strong class="text-slate-300">AAPL</strong> <span class="text-emerald-400">▲ $224.30 (+1.15%)</span></span>
             <span class="mx-6"><strong class="text-slate-300">TSLA</strong> <span class="text-rose-400">▼ $248.20 (-1.80%)</span></span>
             <span class="mx-6"><strong class="text-slate-300">MSFT</strong> <span class="text-emerald-400">▲ $448.90 (+0.85%)</span></span>
             <span class="mx-6"><strong class="text-slate-300">QQQ</strong> <span class="text-emerald-400">▲ $482.10 (+1.05%)</span></span>
             <span class="mx-6"><strong class="text-slate-300">SPY</strong> <span class="text-emerald-400">▲ $555.40 (+0.62%)</span></span>
-            <!-- 重複一組確保無縫滾動 -->
+            <!-- 重複項目無縫循環 -->
             <span class="mx-6"><strong class="text-slate-300">NVDA</strong> <span class="text-emerald-400">▲ $128.50 (+3.42%)</span></span>
             <span class="mx-6"><strong class="text-slate-300">AAPL</strong> <span class="text-emerald-400">▲ $224.30 (+1.15%)</span></span>
             <span class="mx-6"><strong class="text-slate-300">TSLA</strong> <span class="text-rose-400">▼ $248.20 (-1.80%)</span></span>
@@ -96,13 +95,12 @@
 
     <!-- 2. Hero 主視覺區塊 -->
     <section class="min-h-screen flex flex-col justify-center items-center text-center px-4 relative pt-20">
-        <!-- 背景高科技光暈 -->
         <div class="absolute w-[500px] h-[500px] bg-emerald-500/10 rounded-full blur-[120px] -top-10 -left-10 pointer-events-none"></div>
         <div class="absolute w-[500px] h-[500px] bg-cyan-500/10 rounded-full blur-[120px] -bottom-10 -right-10 pointer-events-none"></div>
 
         <div data-aos="fade-down" data-aos-duration="1000" class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 text-emerald-400 font-mono text-xs mb-6">
             <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-            SYSTEM ONLINE • US MARKET TRADING JOURNAL
+            SYSTEM ONLINE • US MARKET HISTORICAL JOURNAL
         </div>
         
         <h1 data-aos="zoom-in" data-aos-duration="1200" class="text-5xl md:text-7xl font-extrabold text-gradient-apple mb-6 tracking-tight leading-tight">
@@ -110,144 +108,187 @@
         </h1>
         
         <p data-aos="fade-up" data-aos-delay="200" data-aos-duration="1000" class="text-slate-400 max-w-2xl text-lg md:text-xl font-light mb-10">
-            專為美股與台股交易者打造的決策覆盤系統。紀錄當下的技術線型、大盤催化劑與下單心理，打造屬於你的可複製獲利模型。
+            解構美股百年的牛熊交替，捕捉每一次主升段的上漲動能。透過系統化覆盤，將歷史的規律轉化為下一次決策的確定性。
         </p>
 
-        <!-- 按鈕組（請記得將第一個 href 換成你 Streamlit 的網址） -->
         <div data-aos="fade-up" data-aos-delay="400" class="flex flex-col sm:flex-row gap-4 w-full sm:w-auto justify-center">
             <a href="https://share.streamlit.io/" target="_blank" class="px-8 py-4 rounded-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold transition-all duration-300 shadow-lg shadow-emerald-500/25 flex items-center justify-center gap-2">
-                <i class="fa-solid fa-chart-line"></i> 啟動交易日誌 App
+                <i class="fa-solid fa-rocket"></i> 啟動覆盤系統 App
             </a>
-            <a href="#kline-demo" class="px-8 py-4 rounded-full glass-card hover:bg-white/10 text-white font-medium transition-all duration-300 flex items-center justify-center gap-2">
-                <i class="fa-solid fa-microchip"></i> 檢視架構
+            <a href="#history-section" class="px-8 py-4 rounded-full glass-card hover:bg-white/10 text-white font-medium transition-all duration-300 flex items-center justify-center gap-2">
+                <i class="fa-solid fa-clock-rotate-left"></i> 探索歷史規律
             </a>
         </div>
 
-        <!-- 向下滾動引導 -->
         <div class="absolute bottom-6 animate-bounce text-slate-500 text-xs font-mono tracking-widest uppercase">
             ↓ Scroll to Explore
         </div>
     </section>
 
-    <!-- 3. K 線視覺示意展示區 (模擬專業交易介面) -->
-    <section id="kline-demo" class="max-w-5xl mx-auto px-6 py-12" data-aos="fade-up" data-aos-duration="1000">
-        <div class="glass-card rounded-3xl p-6 md:p-8 relative overflow-hidden">
-            <!-- 視窗頂部控制列 -->
-            <div class="flex items-center justify-between border-b border-slate-800 pb-4 mb-6">
-                <div class="flex items-center gap-2">
-                    <span class="w-3 h-3 rounded-full bg-rose-500"></span>
-                    <span class="w-3 h-3 rounded-full bg-amber-500"></span>
-                    <span class="w-3 h-3 rounded-full bg-emerald-500"></span>
-                    <span class="ml-4 font-mono text-xs text-slate-400">NVDA / USD • 1D • NASDAQ</span>
-                </div>
-                <div class="font-mono text-xs text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20">
-                    BULLISH BREAKOUT
-                </div>
+    <!-- 3. 新增：歷史大牛市週期覆盤區塊 (Historical Cycles) -->
+    <section id="history-section" class="max-w-6xl mx-auto px-6 py-20" data-aos="fade-up">
+        <div class="text-center mb-16">
+            <span class="text-xs font-mono text-emerald-400 tracking-widest uppercase">[ HISTORICAL LESSONS ]</span>
+            <h2 class="text-3xl md:text-5xl font-bold text-gradient-apple mt-2 mb-4">歷史經典牛市與爆發轉折點</h2>
+            <p class="text-slate-400">每一次強勁的趨勢主升段，背後都有相似的催化劑與資金流向</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- 歷史事件 1 -->
+            <div class="glass-card p-6 rounded-2xl relative overflow-hidden group">
+                <div class="text-4xl font-black font-mono text-slate-800 absolute right-4 top-2 group-hover:text-emerald-500/20 transition-colors">2000</div>
+                <div class="text-emerald-400 font-mono text-xs mb-2">DOT-COM ERA</div>
+                <h3 class="text-xl font-bold text-white mb-2">網際網路泡沫與轉型</h3>
+                <p class="text-slate-400 text-sm leading-relaxed">
+                    科技革命的起點。記錄下泡沫擠掉後的強者恆強，學會在估值修正與技術突破中尋找真正的產業領頭羊。
+                </p>
             </div>
 
-            <!-- K 線示意擬態圖 (SVG Canvas) -->
-            <div class="w-full h-64 flex items-end justify-between gap-2 pt-10 px-2 relative">
-                <!-- 背景水平格線 -->
-                <div class="absolute inset-0 flex flex-col justify-between opacity-10 pointer-events-none">
-                    <div class="border-b border-white w-full"></div>
-                    <div class="border-b border-white w-full"></div>
-                    <div class="border-b border-white w-full"></div>
-                </div>
-
-                <!-- 擬態 K 線柱體 -->
-                <div class="w-full flex flex-col items-center h-[40%] justify-end"><div class="w-0.5 h-full bg-rose-500"></div><div class="w-3 h-[60%] bg-rose-500 rounded-sm"></div></div>
-                <div class="w-full flex flex-col items-center h-[55%] justify-end"><div class="w-0.5 h-full bg-emerald-500"></div><div class="w-3 h-[70%] bg-emerald-500 rounded-sm"></div></div>
-                <div class="w-full flex flex-col items-center h-[45%] justify-end"><div class="w-0.5 h-full bg-rose-500"></div><div class="w-3 h-[50%] bg-rose-500 rounded-sm"></div></div>
-                <div class="w-full flex flex-col items-center h-[65%] justify-end"><div class="w-0.5 h-full bg-emerald-500"></div><div class="w-3 h-[80%] bg-emerald-500 rounded-sm"></div></div>
-                <div class="w-full flex flex-col items-center h-[75%] justify-end"><div class="w-0.5 h-full bg-emerald-500"></div><div class="w-3 h-[60%] bg-emerald-500 rounded-sm"></div></div>
-                <div class="w-full flex flex-col items-center h-[60%] justify-end"><div class="w-0.5 h-full bg-rose-500"></div><div class="w-3 h-[40%] bg-rose-500 rounded-sm"></div></div>
-                <!-- 帶量突破的主 K 線 -->
-                <div class="w-full flex flex-col items-center h-[95%] justify-end relative">
-                    <div class="absolute -top-8 bg-emerald-500 text-slate-950 font-bold font-mono text-[10px] px-2 py-0.5 rounded shadow-lg animate-bounce">
-                        BUY TRIGGER
-                    </div>
-                    <div class="w-0.5 h-full bg-emerald-400"></div>
-                    <div class="w-4 h-[85%] bg-emerald-400 rounded-sm shadow-lg shadow-emerald-500/50"></div>
-                </div>
+            <!-- 歷史事件 2 -->
+            <div class="glass-card p-6 rounded-2xl relative overflow-hidden group">
+                <div class="text-4xl font-black font-mono text-slate-800 absolute right-4 top-2 group-hover:text-emerald-500/20 transition-colors">2009</div>
+                <div class="text-emerald-400 font-mono text-xs mb-2">POST-CRISIS RECOVERY</div>
+                <h3 class="text-xl font-bold text-white mb-2">金融危機後的黃金十年</h3>
+                <p class="text-slate-400 text-sm leading-relaxed">
+                    量化寬鬆 (QE) 的起點。大盤落底訊號與龍頭科技股突破歷史新高，標誌著美股有史以來最長的牛市主升段。
+                </p>
             </div>
-            
-            <div class="mt-6 flex justify-between items-center text-xs font-mono text-slate-500 pt-4 border-t border-slate-800">
-                <span>STRATEGY: Breakout Volatility</span>
-                <span>RISK/REWARD: 1 : 3.5</span>
+
+            <!-- 歷史事件 3 -->
+            <div class="glass-card p-6 rounded-2xl relative overflow-hidden group">
+                <div class="text-4xl font-black font-mono text-slate-800 absolute right-4 top-2 group-hover:text-emerald-500/20 transition-colors">2023+</div>
+                <div class="text-emerald-400 font-mono text-xs mb-2">AI REVOLUTION</div>
+                <h3 class="text-xl font-bold text-white mb-2">生成式 AI 與硬體浪潮</h3>
+                <p class="text-slate-400 text-sm leading-relaxed">
+                    算力即權力。NVDA 等晶片巨頭帶領標普 500 與那斯達克多次刷新高點，再現科技主導的超級週期。
+                </p>
             </div>
         </div>
     </section>
 
-    <!-- 4. 核心功能區塊 (AOS 動畫卡片) -->
-    <section class="max-w-6xl mx-auto px-6 py-24">
-        <div class="text-center mb-20" data-aos="fade-up">
+    <!-- 4. 新增：主升段上漲動能視覺區塊 (Surging Momentum) -->
+    <section class="max-w-6xl mx-auto px-6 py-16" data-aos="fade-up">
+        <div class="glass-card rounded-3xl p-8 md:p-12 relative overflow-hidden border border-emerald-500/20">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+                <div>
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 text-xs font-mono mb-4">
+                        <i class="fa-solid fa-arrow-trend-up"></i> SURGING MOMENTUM
+                    </div>
+                    <h2 class="text-3xl md:text-4xl font-extrabold text-white mb-4 leading-tight">
+                        鎖定主升段<br><span class="text-gradient-green">讓獲利順著趨勢奔跑</span>
+                    </h2>
+                    <p class="text-slate-400 leading-relaxed mb-6">
+                        系統化捕捉股票進入「第二階段上漲（Stage 2 Breakout）」的關鍵特徵：巨量突破、獲利驚喜、籌碼高度集中。記錄每一次買在起漲點的當下狀態。
+                    </p>
+                    <div class="grid grid-cols-2 gap-4 text-slate-300 font-mono text-sm">
+                        <div class="flex items-center gap-2">
+                            <i class="fa-solid fa-check text-emerald-400"></i> 量價配合突破
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <i class="fa-solid fa-check text-emerald-400"></i> 財報催化劑鎖定
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <i class="fa-solid fa-check text-emerald-400"></i> 移動停損保護
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <i class="fa-solid fa-check text-emerald-400"></i> 風險報酬比最適化
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 科技感數據暴漲指標卡片 -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="glass-card p-5 rounded-2xl text-center border-t-2 border-t-emerald-400">
+                        <div class="text-slate-400 text-xs font-mono mb-1">AVERAGE WIN RATE</div>
+                        <div class="text-3xl font-extrabold text-emerald-400 font-mono tracking-tight">+38.5%</div>
+                        <div class="text-[10px] text-slate-500 mt-2">歷史主升段平均波幅</div>
+                    </div>
+                    <div class="glass-card p-5 rounded-2xl text-center border-t-2 border-t-cyan-400">
+                        <div class="text-slate-400 text-xs font-mono mb-1">PROFIT FACTOR</div>
+                        <div class="text-3xl font-extrabold text-cyan-400 font-mono tracking-tight">3.2 : 1</div>
+                        <div class="text-[10px] text-slate-500 mt-2">優質風報比設定</div>
+                    </div>
+                    <div class="glass-card p-5 rounded-2xl text-center border-t-2 border-t-amber-400">
+                        <div class="text-slate-400 text-xs font-mono mb-1">VOLUME SURGE</div>
+                        <div class="text-3xl font-extrabold text-gradient-gold font-mono tracking-tight">250%+</div>
+                        <div class="text-[10px] text-slate-500 mt-2">突破日成交量暴增</div>
+                    </div>
+                    <div class="glass-card p-5 rounded-2xl text-center border-t-2 border-t-purple-400">
+                        <div class="text-slate-400 text-xs font-mono mb-1">MAX DRAWDOWN</div>
+                        <div class="text-3xl font-extrabold text-purple-400 font-mono tracking-tight">&lt; 8%</div>
+                        <div class="text-[10px] text-slate-500 mt-2">嚴格控制下行風險</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 5. 核心功能區塊 (AOS 動畫卡片) -->
+    <section class="max-w-6xl mx-auto px-6 py-20">
+        <div class="text-center mb-16" data-aos="fade-up">
             <h2 class="text-3xl md:text-5xl font-bold text-gradient-apple mb-4">掌握當下的每一個交易關鍵</h2>
             <p class="text-slate-400">排除情緒干擾，建立可重複複製的獲利模型</p>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <!-- 特色卡片 1 -->
             <div class="glass-card p-8 rounded-3xl transition-all duration-300" data-aos="fade-right" data-aos-duration="1000">
                 <div class="w-12 h-12 rounded-2xl bg-emerald-500/20 flex items-center justify-center text-emerald-400 font-bold text-xl mb-6">
-                    <i class="fa-solid fa-chart-simple"></i>
+                    <i class="fa-solid fa-layer-group"></i>
                 </div>
-                <h3 class="text-2xl font-bold text-white mb-3">技術線型與型態判斷</h3>
+                <h3 class="text-2xl font-bold text-white mb-3">關鍵位置與技術型態</h3>
                 <p class="text-slate-400 leading-relaxed">
-                    精準紀錄買賣當下的關鍵支撐（MA 均線、前低、缺口）與壓力位，同時鎖定帶量突破或量縮回測的典型型態。
+                    精準紀錄買賣當下的關鍵支撐（均線、缺口、前高）與壓力位，鎖定帶量突破或量縮回測的典型起漲點。
                 </p>
             </div>
 
-            <!-- 特色卡片 2 -->
             <div class="glass-card p-8 rounded-3xl transition-all duration-300" data-aos="fade-left" data-aos-duration="1000">
                 <div class="w-12 h-12 rounded-2xl bg-cyan-500/20 flex items-center justify-center text-cyan-400 font-bold text-xl mb-6">
                     <i class="fa-solid fa-globe"></i>
                 </div>
                 <h3 class="text-2xl font-bold text-white mb-3">大盤環境與資金籌碼</h3>
                 <p class="text-slate-400 leading-relaxed">
-                    還原當時加權指數/美股大盤走勢與法人籌碼流向（外資、投信、主力），絕不在系統性風險爆發時盲目逆勢操作。
+                    還原當時大盤（S&P 500 / Nasdaq）走勢與資金流向，確保自己站在順風處，絕不在系統性風險爆发時逆勢操作。
                 </p>
             </div>
 
-            <!-- 特色卡片 3 -->
             <div class="glass-card p-8 rounded-3xl transition-all duration-300" data-aos="fade-right" data-aos-duration="1000" data-aos-delay="200">
                 <div class="w-12 h-12 rounded-2xl bg-amber-500/20 flex items-center justify-center text-amber-400 font-bold text-xl mb-6">
                     <i class="fa-solid fa-bolt"></i>
                 </div>
                 <h3 class="text-2xl font-bold text-gradient-gold mb-3">催化劑與新聞事件</h3>
                 <p class="text-slate-400 leading-relaxed">
-                    記錄究竟是什麼訊息觸發了「當下」的交易決策？是財報驚喜 (Earnings Beat)、聯準會降息預期，還是產業利多？
+                    記錄觸發上漲的核心驅動因素：是財報超預期 (Earnings Beat)、聯準會貨幣政策轉向，還是新技術商業化落地？
                 </p>
             </div>
 
-            <!-- 特色卡片 4 -->
             <div class="glass-card p-8 rounded-3xl transition-all duration-300" data-aos="fade-left" data-aos-duration="1000" data-aos-delay="200">
                 <div class="w-12 h-12 rounded-2xl bg-rose-500/20 flex items-center justify-center text-rose-400 font-bold text-xl mb-6">
                     <i class="fa-solid fa-brain"></i>
                 </div>
                 <h3 class="text-2xl font-bold text-white mb-3">紀律執行與心理覆盤</h3>
                 <p class="text-slate-400 leading-relaxed">
-                    檢視下單當下是冷靜執行計畫，還是受到恐懼錯過 (FOMO) 的情緒控制？建立嚴格的停損停利機制與風報酬比。
+                    檢視下單當下是冷靜執行策略，還是被 FOMO 情緒影響？記錄停損停利機制，建構戰勝心理弱點的硬體紀律。
                 </p>
             </div>
         </div>
     </section>
 
-    <!-- 5. 滿版金句區塊 -->
-    <section class="py-28 bg-slate-950/80 border-y border-slate-800/80 my-12 relative overflow-hidden">
+    <!-- 6. 滿版金句區塊 -->
+    <section class="py-24 bg-slate-950/80 border-y border-slate-800/80 my-12 relative overflow-hidden">
         <div class="max-w-4xl mx-auto text-center px-6 relative z-10" data-aos="zoom-in-up" data-aos-duration="1200">
-            <span class="text-xs font-mono text-emerald-400 tracking-widest uppercase">[ Trading Philosophy ]</span>
+            <span class="text-xs font-mono text-emerald-400 tracking-widest uppercase">[ TRADING PHILOSOPHY ]</span>
             <h2 class="text-3xl md:text-5xl font-extrabold text-white mt-4 mb-8 leading-tight tracking-tight">
-                「在重複的規律走勢中，<br>尋找高確定性的獲利軌跡。」
+                「在歷史重複的週期中，<br>抓緊每一次主升段的噴發。」
             </h2>
             <p class="text-slate-400 text-lg font-light">
-                新聞故事千變萬化，但反映在 K 線上的貪婪與恐慌永遠相同。透過視覺化數據庫，建構專屬於你的交易聖杯。
+                故事會變，但資本市場對利益的追逐永遠不變。覆盤不是為了預測未來，而是為了在趨勢來臨時重拳出擊。
             </p>
         </div>
     </section>
 
     <!-- 頁尾 Footer -->
     <footer class="py-12 text-center text-slate-600 text-xs font-mono">
-        <p>© Trading Journal System. Designed with Apple aesthetic & Financial Tech style.</p>
+        <p>© Stock Recorder System. Focused on Historical Cycles & Surging Momentum.</p>
     </footer>
 
     <!-- AOS 滾動動畫腳本 -->
@@ -260,4 +301,4 @@
         });
     </script>
 </body>
-</html>、
+</html>
