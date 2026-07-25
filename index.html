@@ -6,7 +6,7 @@
     <title>Trading Journal | 美股歷史覆盤與科技量化決策系統</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- AOS CSS -->
+    <!-- AOS CSS (滾動動畫庫) -->
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <!-- FontAwesome 圖示庫 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -18,19 +18,19 @@
             overflow-x: hidden;
         }
 
-        /* 玻璃擬態與流線光暈 */
-        .glass-pill {
-            background: rgba(15, 23, 42, 0.5);
-            backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-        }
+        /* 玻璃擬態與脈衝光暈 */
         .glass-panel {
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(15, 23, 42, 0.6) 100%);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.03) 0%, rgba(15, 23, 42, 0.65) 100%);
             backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+        }
+        .glass-panel:hover {
+            border-color: rgba(16, 185, 129, 0.3);
+            box-shadow: 0 0 30px rgba(16, 185, 129, 0.15);
         }
 
-        /* 漸層文字效果 */
+        /* 漸層文字 */
         .text-gradient-green {
             background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
             -webkit-background-clip: text;
@@ -41,13 +41,18 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
+        .text-gradient-gold {
+            background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
         .text-gradient-apple {
             background: linear-gradient(180deg, #ffffff 0%, #94a3b8 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
-        /* 美股霓虹動態跑馬燈 */
+        /* 美股動態跑馬燈 */
         @keyframes ticker {
             0% { transform: translate3d(0, 0, 0); }
             100% { transform: translate3d(-50%, 0, 0); }
@@ -64,26 +69,24 @@
             animation: ticker 30s linear infinite;
         }
 
-        /* 科技感動態背景（交錯雷射光網格與粒子光束） */
+        /* 科技感交錯雷射背景 */
         .tech-bg {
             background-image: 
-                radial-gradient(ellipse at 50% -20%, rgba(16, 185, 129, 0.15), transparent 70%),
-                radial-gradient(ellipse at 80% 60%, rgba(6, 182, 212, 0.10), transparent 50%),
-                radial-gradient(ellipse at 10% 90%, rgba(244, 63, 94, 0.08), transparent 50%),
-                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 0),
-                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 0);
-            background-size: 100% 100%, 100% 100%, 100% 100%, 40px 40px, 40px 40px;
+                radial-gradient(ellipse at 50% 0%, rgba(16, 185, 129, 0.18), transparent 70%),
+                radial-gradient(ellipse at 80% 50%, rgba(6, 182, 212, 0.12), transparent 50%),
+                linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 0),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 0);
+            background-size: 100% 100%, 100% 100%, 40px 40px, 40px 40px;
         }
 
-        /* 呼吸光脈動 */
         .pulse-glow {
-            box-shadow: 0 0 50px -10px rgba(16, 185, 129, 0.3);
+            box-shadow: 0 0 50px -10px rgba(16, 185, 129, 0.35);
         }
     </style>
 </head>
 <body class="antialiased tech-bg">
 
-    <!-- 1. 美股即時行情動態跑馬燈 -->
+    <!-- 1. 美股即時行情跑馬燈 -->
     <div class="ticker-wrap py-2.5 fixed top-0 w-full z-50 backdrop-blur-md">
         <div class="ticker-move text-xs font-mono tracking-wider">
             <span class="mx-6"><strong class="text-slate-200">NVDA</strong> <span class="text-emerald-400">▲ $128.50 (+3.42%)</span></span>
@@ -91,22 +94,18 @@
             <span class="mx-6"><strong class="text-slate-200">S&P 500</strong> <span class="text-emerald-400">▲ 5,580.40 (+0.82%)</span></span>
             <span class="mx-6"><strong class="text-slate-200">AAPL</strong> <span class="text-emerald-400">▲ $224.30 (+1.15%)</span></span>
             <span class="mx-6"><strong class="text-slate-200">TSLA</strong> <span class="text-rose-400">▼ $248.20 (-1.80%)</span></span>
-            <span class="mx-6"><strong class="text-slate-200">MSFT</strong> <span class="text-emerald-400">▲ $448.90 (+0.85%)</span></span>
-            <!-- 循環複製組 -->
+            <!-- 循環組 -->
             <span class="mx-6"><strong class="text-slate-200">NVDA</strong> <span class="text-emerald-400">▲ $128.50 (+3.42%)</span></span>
             <span class="mx-6"><strong class="text-slate-200">NASDAQ</strong> <span class="text-emerald-400">▲ 17,850.20 (+1.25%)</span></span>
             <span class="mx-6"><strong class="text-slate-200">S&P 500</strong> <span class="text-emerald-400">▲ $555.40 (+0.82%)</span></span>
-            <span class="mx-6"><strong class="text-slate-200">AAPL</strong> <span class="text-emerald-400">▲ $224.30 (+1.15%)</span></span>
-            <span class="mx-6"><strong class="text-slate-200">TSLA</strong> <span class="text-rose-400">▼ $248.20 (-1.80%)</span></span>
-            <span class="mx-6"><strong class="text-slate-200">MSFT</strong> <span class="text-emerald-400">▲ $448.90 (+0.85%)</span></span>
         </div>
     </div>
 
-    <!-- 2. Hero 主視覺區塊 -->
+    <!-- 2. Hero 主視覺 -->
     <section class="min-h-screen flex flex-col justify-center items-center text-center px-6 relative pt-24 pb-16">
-        <div data-aos="fade-down" data-aos-duration="1000" class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-pill text-emerald-400 font-mono text-xs mb-8 border border-emerald-500/30">
+        <div data-aos="fade-down" data-aos-duration="1000" class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-mono text-xs mb-8">
             <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
-            QUANT & HISTORICAL TRADING SYSTEM
+            HISTORICAL TRADING & DECISION SYSTEM
         </div>
         
         <h1 data-aos="zoom-in" data-aos-duration="1200" class="text-5xl md:text-8xl font-black text-gradient-apple mb-6 tracking-tight leading-none">
@@ -114,252 +113,116 @@
         </h1>
         
         <p data-aos="fade-up" data-aos-delay="200" class="text-slate-400 max-w-3xl text-lg md:text-2xl font-light mb-12 leading-relaxed">
-            告別盲目憑感覺下單。結合美股百年牛熊週期與個人交易心理學，打造極致專注的科技覆盤終端。
+            告別盲目憑感覺下單。紀錄每一次買賣當下的技術型態、催化劑與心理狀態，將歷史的經驗轉化為下一次決策的確定性。
         </p>
 
-        <!-- 串接專屬 Streamlit App 網址 -->
         <div data-aos="fade-up" data-aos-delay="400" class="flex flex-col sm:flex-row gap-5 w-full sm:w-auto justify-center">
             <a href="https://stockrecorder-wb49zcrpffjtm7fe95ntdn.streamlit.app/" target="_blank" class="px-10 py-5 rounded-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-lg transition-all duration-300 pulse-glow flex items-center justify-center gap-3">
-                <i class="fa-solid fa-terminal"></i> 啟動交易覆盤系統
+                <i class="fa-solid fa-terminal"></i> 啟動交易覆盤 App
             </a>
-            <a href="#market-metrics" class="px-10 py-5 rounded-full glass-pill hover:bg-white/10 text-white font-medium text-lg transition-all duration-300 flex items-center justify-center gap-3">
-                <i class="fa-solid fa-compass"></i> 探索系統核心
+            <a href="#why-journaling" class="px-10 py-5 rounded-full bg-slate-900/80 hover:bg-white/10 text-white font-medium text-lg transition-all duration-300 border border-slate-800 flex items-center justify-center gap-3">
+                <i class="fa-solid fa-book-bookmark"></i> 為什麼「紀錄」如此重要？
             </a>
         </div>
 
         <div class="mt-20 animate-bounce text-slate-500 text-xs font-mono tracking-widest uppercase flex items-center gap-2">
-            <i class="fa-solid fa-chevron-down text-emerald-400"></i> 向下滑動解鎖股市規律
+            <i class="fa-solid fa-chevron-down text-emerald-400"></i> 向下滑動探索覆盤聖杯
         </div>
     </section>
 
-    <!-- 3. 科技視覺：三大指數動態儀表板視覺 (Market Metrics) -->
-    <section id="market-metrics" class="max-w-6xl mx-auto px-6 py-12" data-aos="fade-up">
-        <div class="glass-panel p-8 rounded-3xl relative overflow-hidden">
-            <div class="flex flex-col md:flex-row justify-between items-center gap-6 border-b border-slate-800 pb-6 mb-8">
-                <div>
-                    <span class="text-xs font-mono text-emerald-400 tracking-widest">[ REAL-TIME CONTEXT ]</span>
-                    <h3 class="text-2xl font-bold text-white mt-1">美股三大核心指數動態與大盤環境</h3>
-                </div>
-                <div class="flex gap-2">
-                    <span class="px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-mono">BULLISH BIAS</span>
-                    <span class="px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-mono">FED RATE PAUSE</span>
-                </div>
-            </div>
-
-            <!-- 非傳統死板方格：改用長條動態流線與圓形進度圖表 -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <!-- 指數 1 -->
-                <div class="flex items-center gap-4">
-                    <div class="w-16 h-16 rounded-full bg-emerald-500/10 border-2 border-emerald-400 flex items-center justify-center text-emerald-400 font-mono font-bold text-lg">
-                        92%
-                    </div>
-                    <div>
-                        <div class="text-slate-400 text-xs font-mono">NASDAQ 100 TREND</div>
-                        <div class="text-xl font-bold text-white">多頭趨勢成立</div>
-                        <div class="text-xs text-emerald-400 mt-1"><i class="fa-solid fa-angle-up"></i> 站穩 20 日與 50 日均線</div>
-                    </div>
-                </div>
-
-                <!-- 指數 2 -->
-                <div class="flex items-center gap-4">
-                    <div class="w-16 h-16 rounded-full bg-cyan-500/10 border-2 border-cyan-400 flex items-center justify-center text-cyan-400 font-mono font-bold text-lg">
-                        1:3.2
-                    </div>
-                    <div>
-                        <div class="text-slate-400 text-xs font-mono">RISK / REWARD RATIO</div>
-                        <div class="text-xl font-bold text-white">優質風報比區間</div>
-                        <div class="text-xs text-cyan-400 mt-1"><i class="fa-solid fa-shield"></i> 適合佈局第二階段起漲股</div>
-                    </div>
-                </div>
-
-                <!-- 指數 3 -->
-                <div class="flex items-center gap-4">
-                    <div class="w-16 h-16 rounded-full bg-amber-500/10 border-2 border-amber-400 flex items-center justify-center text-amber-400 font-mono font-bold text-lg">
-                        12.4
-                    </div>
-                    <div>
-                        <div class="text-slate-400 text-xs font-mono">VOLATILITY INDEX (VIX)</div>
-                        <div class="text-xl font-bold text-white">恐慌指數處於低位</div>
-                        <div class="text-xs text-amber-400 mt-1"><i class="fa-solid fa-bolt"></i> 市場情緒溫和且籌碼穩定</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- 4. 交錯式排版：為什麼 90% 的散戶會虧錢？ (The Trader's Trap) -->
-    <section class="max-w-6xl mx-auto px-6 py-24" data-aos="fade-up">
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <!-- 左側文字說明 -->
-            <div>
-                <span class="text-xs font-mono text-rose-400 tracking-widest uppercase">[ WHY TRADERS FAIL ]</span>
-                <h2 class="text-3xl md:text-5xl font-extrabold text-white mt-2 mb-6 leading-tight">
-                    未經覆盤的交易，<br>只是一場<span class="text-gradient-cyan">高風險的賭博</span>。
-                </h2>
-                <div class="space-y-6 text-slate-300">
-                    <div class="flex gap-4">
-                        <div class="w-10 h-10 rounded-xl bg-rose-500/20 text-rose-400 flex items-center justify-center shrink-0 font-bold">✕</div>
-                        <div>
-                            <h4 class="font-bold text-white text-lg">情緒支配（FOMO 追高）</h4>
-                            <p class="text-slate-400 text-sm mt-1">看到股票暴漲才衝進去接盤，跌破支撐時又因恐慌砍在最低點。</p>
-                        </div>
-                    </div>
-                    <div class="flex gap-4">
-                        <div class="w-10 h-10 rounded-xl bg-rose-500/20 text-rose-400 flex items-center justify-center shrink-0 font-bold">✕</div>
-                        <div>
-                            <h4 class="font-bold text-white text-lg">缺乏可複製的下單模型</h4>
-                            <p class="text-slate-400 text-sm mt-1">賺錢不知道為什麼賺，虧錢也不知道錯在哪裡，導致資產曲線劇烈震盪。</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 右側科技流線對比面板 -->
-            <div class="glass-panel p-8 rounded-3xl relative border-l-4 border-l-emerald-400">
-                <div class="text-xs font-mono text-emerald-400 mb-2">// THE SOLUTION</div>
-                <h3 class="text-2xl font-bold text-white mb-4">這套系統如何徹底拯救你的交易？</h3>
-                <p class="text-slate-400 text-sm leading-relaxed mb-6">
-                    我們將每一次交易拆解為「技術形態」、「大盤催化劑」、「心理狀態」與「風報比」，將抽象的感覺轉化為精確的可視化數據。
-                </p>
-                <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-800 font-mono text-xs text-slate-300 space-y-2">
-                    <div class="text-emerald-400">> 正在捕捉入場邏輯: 突破 50日均線帶量... OK</div>
-                    <div class="text-cyan-400">> 分析心理狀態: 遵守紀律 (No FOMO)... OK</div>
-                    <div class="text-slate-400">> 計算歷史勝率加權: 84.2%... COMPLETED</div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- 5. 牛市狂歡 vs 熊市修復（雙色光影流線對比） -->
-    <section class="max-w-6xl mx-auto px-6 py-20" data-aos="fade-up">
+    <!-- 3. 新增高亮區塊：為什麼「每日紀錄與覆盤」是唯一獲利聖杯？ -->
+    <section id="why-journaling" class="max-w-6xl mx-auto px-6 py-24" data-aos="fade-up">
         <div class="text-center mb-16">
-            <span class="text-xs font-mono text-emerald-400 tracking-widest uppercase">[ MARKET CYCLES ]</span>
-            <h2 class="text-3xl md:text-5xl font-bold text-gradient-apple mt-2 mb-4">牛市主升段 vs 熊市洗盤期</h2>
-            <p class="text-slate-400">認識歷史週期的韻律，在不同的市場季節採取完全不同的策略</p>
+            <span class="text-xs font-mono text-emerald-400 tracking-widest uppercase">[ THE POWER OF JOURNALING ]</span>
+            <h2 class="text-3xl md:text-5xl font-extrabold text-gradient-apple mt-2 mb-4">為什麼 90% 的人重複犯錯，而 10% 的人持續獲利？</h2>
+            <p class="text-slate-400 max-w-2xl mx-auto">大腦的記憶是不可靠的。下單當下的貪婪與恐慌，往往在平倉後被記憶自動淡化。唯有紀錄能還原真實。」</p>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <!-- 牛市 -->
-            <div class="p-8 rounded-3xl bg-gradient-to-br from-emerald-950/40 to-slate-900/80 border border-emerald-500/30 relative overflow-hidden">
-                <div class="text-emerald-400 font-mono text-xs font-bold mb-2">STAGE 2 • SURGING BULL</div>
-                <h3 class="text-2xl font-bold text-white mb-4">牛市狂歡：讓利潤奔跑</h3>
-                <p class="text-slate-300 text-sm leading-relaxed mb-6">
-                    特徵：大盤站上長天期均線、財報亮眼（Earnings Beat）、熱門產業資金強烈輪動。覆盤重點放在「鎖定龍頭」與「勇敢抱緊」。
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="glass-panel p-8 rounded-3xl" data-aos="fade-right" data-aos-delay="100">
+                <div class="w-12 h-12 rounded-2xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xl font-bold mb-6">01</div>
+                <h3 class="text-xl font-bold text-white mb-3">破解 FOMO 衝動陷阱</h3>
+                <p class="text-slate-400 text-sm leading-relaxed">
+                    在表單中強迫自己輸入「為什麼當下下單？」，能讓你在按下買進前冷靜 10 秒，過濾掉 80% 因為大漲急著追入的錯誤決策。
                 </p>
-                <div class="inline-flex items-center gap-2 text-emerald-400 text-xs font-mono bg-emerald-500/10 px-3 py-1.5 rounded-full border border-emerald-500/20">
-                    <i class="fa-solid fa-arrow-trend-up"></i> 主升段強烈建議持股
-                </div>
             </div>
 
-            <!-- 熊市 -->
-            <div class="p-8 rounded-3xl bg-gradient-to-br from-rose-950/40 to-slate-900/80 border border-rose-500/30 relative overflow-hidden">
-                <div class="text-rose-400 font-mono text-xs font-bold mb-2">STAGE 4 • PANIC BEAR</div>
-                <h3 class="text-2xl font-bold text-white mb-4">熊市修復：現金即是王道</h3>
-                <p class="text-slate-300 text-sm leading-relaxed mb-6">
-                    特徵：高估值修復、利率緊縮、利多不漲。覆盤重點放在「嚴格停損」、「保留實力」，絕不在暴跌中盲目抄底。
+            <div class="glass-panel p-8 rounded-3xl" data-aos="fade-up" data-aos-delay="200">
+                <div class="w-12 h-12 rounded-2xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center text-xl font-bold mb-6">02</div>
+                <h3 class="text-xl font-bold text-white mb-3">建立專屬「起漲數據庫」</h3>
+                <p class="text-slate-400 text-sm leading-relaxed">
+                    紀錄帶量突破、量縮整理等型態。累積 30 筆紀錄後，你就能透過歷史總覽，找出屬於你勝率最高的可複製獲利模型。
                 </p>
-                <div class="inline-flex items-center gap-2 text-rose-400 text-xs font-mono bg-rose-500/10 px-3 py-1.5 rounded-full border border-rose-500/20">
-                    <i class="fa-solid fa-shield-halved"></i> 資金防禦與現金至上
-                </div>
+            </div>
+
+            <div class="glass-panel p-8 rounded-3xl" data-aos="fade-left" data-aos-delay="300">
+                <div class="w-12 h-12 rounded-2xl bg-amber-500/20 text-gradient-gold flex items-center justify-center text-xl font-bold mb-6">03</div>
+                <h3 class="text-xl font-bold text-white mb-3">嚴格執行風控紀律</h3>
+                <p class="text-slate-400 text-sm leading-relaxed">
+                    預先寫下停損價位與下單心態。當市場走勢不如預期時，依靠當初寫下的紀錄冷靜執行停損，絕不在暴跌中寄望奇蹟。
+                </p>
             </div>
         </div>
     </section>
 
-    <!-- 6. 百年美股四大爆發點（時間軸串聯，告別格子） -->
+    <!-- 4. 酷炫滾動時間軸：美股歷史週期的押韻 (Scroll Timeline) -->
     <section class="max-w-5xl mx-auto px-6 py-24" data-aos="fade-up">
         <div class="text-center mb-16">
-            <span class="text-xs font-mono text-cyan-400 tracking-widest uppercase">[ TIMELINE OF VALUATION ]</span>
-            <h2 class="text-3xl md:text-5xl font-bold text-gradient-apple mt-2">百年美股歷史的四大轉折時刻</h2>
+            <span class="text-xs font-mono text-cyan-400 tracking-widest uppercase">[ HISTORICAL CYCLES ]</span>
+            <h2 class="text-3xl md:text-5xl font-bold text-gradient-apple mt-2">歷史在重複，機會也在重演</h2>
         </div>
 
-        <div class="space-y-8 relative before:absolute before:inset-0 before:left-8 md:before:left-1/2 before:w-0.5 before:bg-slate-800">
-            <!-- 時間點 1 -->
-            <div class="relative flex flex-col md:flex-row items-center justify-between gap-8">
+        <div class="space-y-12 relative before:absolute before:inset-0 before:left-8 md:before:left-1/2 before:w-0.5 before:bg-slate-800">
+            <div class="relative flex flex-col md:flex-row items-center justify-between gap-8" data-aos="fade-right">
                 <div class="w-full md:w-1/2 md:text-right pr-0 md:pr-10">
-                    <span class="text-emerald-400 font-mono font-bold text-sm">2000 年 • 網際網路</span>
-                    <h4 class="text-xl font-bold text-white mt-1">Dot-Com 泡沫與科技轉型</h4>
-                    <p class="text-slate-400 text-xs mt-2 leading-relaxed">估值過高後的慘烈修正，但也篩選出真正具備商業壁壘的巨頭（如 Amazon）。</p>
+                    <span class="text-emerald-400 font-mono font-bold text-sm">2000 年 • DOT-COM</span>
+                    <h4 class="text-xl font-bold text-white mt-1">網際網路泡沫與修正</h4>
+                    <p class="text-slate-400 text-xs mt-2 leading-relaxed">泡沫破裂後篩選出真正具備商業壁壘的巨頭，覆盤教我們如何在暴跌中冷靜尋找真金。</p>
                 </div>
-                <div class="w-8 h-8 rounded-full bg-emerald-500 border-4 border-slate-950 shrink-0 z-10"></div>
+                <div class="w-8 h-8 rounded-full bg-emerald-500 border-4 border-slate-950 shrink-0 z-10 shadow-lg shadow-emerald-500/50"></div>
                 <div class="w-full md:w-1/2 pl-0 md:pl-10"></div>
             </div>
 
-            <!-- 時間點 2 -->
-            <div class="relative flex flex-col md:flex-row items-center justify-between gap-8">
+            <div class="relative flex flex-col md:flex-row items-center justify-between gap-8" data-aos="fade-left">
                 <div class="w-full md:w-1/2 pr-0 md:pr-10"></div>
-                <div class="w-8 h-8 rounded-full bg-cyan-500 border-4 border-slate-950 shrink-0 z-10"></div>
+                <div class="w-8 h-8 rounded-full bg-cyan-500 border-4 border-slate-950 shrink-0 z-10 shadow-lg shadow-cyan-500/50"></div>
                 <div class="w-full md:w-1/2 pl-0 md:pl-10">
-                    <span class="text-cyan-400 font-mono font-bold text-sm">2008 年 • 金融危機</span>
-                    <h4 class="text-xl font-bold text-white mt-1">次貸風暴與 QE 時代開端</h4>
-                    <p class="text-slate-400 text-xs mt-2 leading-relaxed">當全市場陷入絕望時，正是美股歷史上記錄最強勁的十年黃金落底起漲點。</p>
+                    <span class="text-cyan-400 font-mono font-bold text-sm">2008 年 • FINANCIAL CRISIS</span>
+                    <h4 class="text-xl font-bold text-white mt-1">次貸風暴與黃金落底點</h4>
+                    <p class="text-slate-400 text-xs mt-2 leading-relaxed">絕望中誕生牛市。熟悉歷史週期的交易者，在全市場恐慌時把握住了黃金十年起漲點。</p>
                 </div>
             </div>
 
-            <!-- 時間點 3 -->
-            <div class="relative flex flex-col md:flex-row items-center justify-between gap-8">
+            <div class="relative flex flex-col md:flex-row items-center justify-between gap-8" data-aos="fade-right">
                 <div class="w-full md:w-1/2 md:text-right pr-0 md:pr-10">
-                    <span class="text-amber-400 font-mono font-bold text-sm">2020 年 • 資金浪潮</span>
-                    <h4 class="text-xl font-bold text-white mt-1">疫情後的閃電復甦</h4>
-                    <p class="text-slate-400 text-xs mt-2 leading-relaxed">央行注入極致流動性，帶動科技股以歷史最快速度刷新高點。</p>
+                    <span class="text-purple-400 font-mono font-bold text-sm">2024+ 年 • AI REVOLUTION</span>
+                    <h4 class="text-xl font-bold text-white mt-1">生成式 AI 算力主升段</h4>
+                    <p class="text-slate-400 text-xs mt-2 leading-relaxed">輝達（NVDA）與晶片股大爆發。系統化覆盤讓你第一時間鎖定主升段起漲訊號。</p>
                 </div>
-                <div class="w-8 h-8 rounded-full bg-amber-500 border-4 border-slate-950 shrink-0 z-10"></div>
+                <div class="w-8 h-8 rounded-full bg-purple-500 border-4 border-slate-950 shrink-0 z-10 shadow-lg shadow-purple-500/50"></div>
                 <div class="w-full md:w-1/2 pl-0 md:pl-10"></div>
-            </div>
-
-            <!-- 時間點 4 -->
-            <div class="relative flex flex-col md:flex-row items-center justify-between gap-8">
-                <div class="w-full md:w-1/2 pr-0 md:pr-10"></div>
-                <div class="w-8 h-8 rounded-full bg-purple-500 border-4 border-slate-950 shrink-0 z-10"></div>
-                <div class="w-full md:w-1/2 pl-0 md:pl-10">
-                    <span class="text-purple-400 font-mono font-bold text-sm">2024+ 年 • AI 革命</span>
-                    <h4 class="text-xl font-bold text-white mt-1">生成式 AI 算力大爆發</h4>
-                    <p class="text-slate-400 text-xs mt-2 leading-relaxed">輝達（NVDA）帶領半導體與軟體巨頭衝上全新里程碑。</p>
-                </div>
             </div>
         </div>
     </section>
 
-    <!-- 7. FAQ 交易常見問題解答 (FAQ Accordion 增強下滑互動) -->
-    <section class="max-w-4xl mx-auto px-6 py-20" data-aos="fade-up">
-        <div class="text-center mb-12">
-            <span class="text-xs font-mono text-emerald-400 tracking-widest uppercase">[ FREQUENTLY ASKED QUESTIONS ]</span>
-            <h2 class="text-3xl font-bold text-white mt-2">關於交易覆盤的常見疑問</h2>
-        </div>
-
-        <div class="space-y-4">
-            <div class="glass-panel p-6 rounded-2xl">
-                <h4 class="text-lg font-bold text-white mb-2"><i class="fa-regular fa-circle-question text-emerald-400 mr-2"></i> 我每天需要花多少時間覆盤？</h4>
-                <p class="text-slate-400 text-sm">借助這套系統，你只需要在下單後花 3~5 分鐘輸入買賣邏輯與停損價位。系統會自動幫你記錄當時的時間點與環境狀態。</p>
-            </div>
-            <div class="glass-panel p-6 rounded-2xl">
-                <h4 class="text-lg font-bold text-white mb-2"><i class="fa-regular fa-circle-question text-cyan-400 mr-2"></i> 這套系統適合美股還是台股？</h4>
-                <p class="text-slate-400 text-sm">兩者皆適用！技術型態（突破、回測）與心理學（停損紀律、風報比）在任何資本市場都是共通的底層邏輯。</p>
-            </div>
-            <div class="glass-panel p-6 rounded-2xl">
-                <h4 class="text-lg font-bold text-white mb-2"><i class="fa-regular fa-circle-question text-amber-400 mr-2"></i> 我的交易資料會儲存在哪裡？</h4>
-                <p class="text-slate-400 text-sm">系統完全託管於 Streamlit 雲端伺服器與你個人掌控的 Python Pandas 數據結構中，安全且獨立。</p>
-            </div>
-        </div>
-    </section>
-
-    <!-- 8. 最終 Call to Action 滿版區塊 -->
-    <section class="py-28 bg-gradient-to-b from-slate-950 to-emerald-950/30 border-t border-slate-800 text-center relative overflow-hidden">
-        <div class="max-w-3xl mx-auto px-6 relative z-10" data-aos="zoom-in">
-            <h2 class="text-4xl md:text-6xl font-black text-white mb-6 tracking-tight">準備好打造你的<br><span class="text-gradient-green">專屬獲利模型了嗎？</span></h2>
-            <p class="text-slate-400 text-lg mb-10 font-light">立即開始記錄第一筆交易，體驗系統化覆盤帶來的確定性與冷靜紀律。</p>
+    <!-- 5. 最終 Call to Action -->
+    <section class="py-28 bg-gradient-to-b from-slate-950 to-emerald-950/30 border-t border-slate-800 text-center relative overflow-hidden" data-aos="zoom-in">
+        <div class="max-w-3xl mx-auto px-6 relative z-10">
+            <h2 class="text-4xl md:text-6xl font-black text-white mb-6 tracking-tight">打造專屬於你的<br><span class="text-gradient-green">交易聖杯系統</span></h2>
+            <p class="text-slate-400 text-lg mb-10 font-light">立刻輸入第一筆交易，開啟冷靜、客觀且高勝率的覆盤之路。</p>
             
             <a href="https://stockrecorder-wb49zcrpffjtm7fe95ntdn.streamlit.app/" target="_blank" class="inline-flex items-center gap-3 px-10 py-5 rounded-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-xl transition-all pulse-glow">
                 <i class="fa-solid fa-play"></i> 免費開啟 Streamlit 覆盤 App
             </a>
         </div>
-    </footer>
+    </section>
 
-    <!-- 9. 頁尾 Footer -->
+    <!-- Footer -->
     <footer class="py-12 text-center text-slate-600 text-xs font-mono border-t border-slate-900">
-        <p>© Stock Recorder System. Apple-inspired Aesthetics & Quant Trading Workflow.</p>
+        <p>© Stock Recorder System. Focused on Decision Journaling & Historical Cycles.</p>
     </footer>
 
-    <!-- AOS 動畫腳本 -->
+    <!-- AOS 腳本 -->
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script>
         AOS.init({
