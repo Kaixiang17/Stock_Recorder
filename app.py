@@ -1,9 +1,9 @@
 import streamlit as st
 import pandas as pd
+import requests
 from datetime import datetime
-from streamlit_gsheets import GSheetsConnection
 
-# 頁面基本配置
+# 頁面配置
 st.set_page_config(
     page_title="Stock Recorder | 交易決策與覆盤終端",
     page_icon="📈",
@@ -11,7 +11,6 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# 自訂 CSS 質感
 st.markdown("""
 <style>
     .main { background-color: #0b0f19; }
@@ -33,20 +32,9 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# 建立 Google Sheets 連線
-conn = st.connection("gsheets", type=GSheetsConnection)
+# 取得 Secrets 中的 Google Web App API 網址
+WEB_APP_URL = st.secrets.get("GOOGLE_WEB_APP_URL", "")
 
-# 讀取試算表資料的函式
-def load_data():
-    try:
-        # ttl=0 表示不快取，每次重新讀取最新資料
-        df = conn.read(ttl=0)
-        return df
-    except Exception as e:
-        st.error(f"無法讀取 Google Sheets，請檢查 secrets 設定。錯誤資訊: {e}")
-        return pd.DataFrame()
-
-# --- 頁頭 Header ---
 st.markdown('<div class="hero-title">📈 股票買賣與每日歷史決策紀錄表</div>', unsafe_allow_html=True)
 st.markdown('<div class="hero-quote">「歷史不會重複，但總是吟唱著相同的押韻」—— 記錄當下情境，打造專屬交易系統</div>', unsafe_allow_html=True)
 
@@ -59,8 +47,6 @@ with tab_new:
     st.caption("請填寫當下的交易邏輯與心理狀態，點擊底部提交以同步儲存至 Google Sheets。")
     
     with st.form(key="trade_entry_form", clear_on_submit=True):
-        
-        # 1. 基本屬性
         st.markdown("### 1. 基本屬性與交易參數")
         col1, col2, col3 = st.columns(3)
         with col1:
@@ -75,7 +61,6 @@ with tab_new:
 
         st.divider()
 
-        # 2. 技術面與大盤
         st.markdown("### 2. 技術面與大盤環境")
         col4, col5 = st.columns(2)
         with col4:
@@ -88,7 +73,6 @@ with tab_new:
 
         st.divider()
 
-        # 3. 催化劑與心態
         st.markdown("### 3. 催化劑與風險心態控制")
         col6, col7 = st.columns(2)
         with col6:
@@ -103,15 +87,15 @@ with tab_new:
             )
             core_reason = st.text_area("為什麼「當下」下單？(核心理由)", placeholder="請簡述當下非買/賣不可的核心邏輯...", height=100)
 
-        # 提交按鈕
         submit_button = st.form_submit_button(label="🚀 儲存至 Google Sheets 資料庫", use_container_width=True)
         
         if submit_button:
             if not symbol_name:
                 st.warning("⚠️ 請輸入股票代號與名稱！")
+            elif not WEB_APP_URL:
+                st.error("⚠️ 請在 Streamlit Secrets 設定 GOOGLE_WEB_APP_URL！")
             else:
-                existing_data = load_data()
-                new_entry = pd.DataFrame([{
+                payload = {
                     "交易日期": str(trade_date),
                     "股票代號/名稱": symbol_name,
                     "操作": action_type,
@@ -127,23 +111,22 @@ with tab_new:
                     "停利價": take_profit,
                     "下單心態": mindset,
                     "核心理由": core_reason
-                }])
+                }
                 
-                updated_df = pd.concat([existing_data, new_entry], ignore_index=True)
-                conn.update(data=updated_df)
-                st.success(f"✅ 成功寫入 Google Sheets！【{symbol_name}】紀錄已更新。")
+                try:
+                    res = requests.post(WEB_APP_URL, json=payload)
+                    if res.status_code == 200:
+                        st.success(f"✅ 成功寫入 Google Sheets！【{symbol_name}】紀錄已更新。")
+                    else:
+                        st.error(f"❌ 寫入失敗，HTTP 狀態碼: {res.status_code}")
+                except Exception as e:
+                    st.error(f"❌ 連線發生錯誤: {e}")
 
 # ==========================================
 # TAB 2: 歷史決策總覽與覆盤
 # ==========================================
 with tab_history:
-    st.markdown("### 📊 歷史紀錄檢視（實時同步 Google Sheets）")
-    
+    st.markdown("### 📊 歷史紀錄檢視")
+    st.info("💡 提醒：你可以隨時開啟 Google Sheets 直接進行資料刪除、修改與後台維護。")
     if st.button("🔄 重新整理資料庫"):
         st.rerun()
-
-    data = load_data()
-    if data.empty:
-        st.info("💡 目前資料庫為空，請至「📝 新增交易決策」填寫第一筆紀錄。")
-    else:
-        st.dataframe(data, use_container_width=True, hide_index=True)
