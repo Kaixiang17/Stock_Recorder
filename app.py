@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 from datetime import datetime
+from streamlit_gsheets import GSheetsConnection
 
 # 頁面基本配置
 st.set_page_config(
@@ -10,7 +11,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# 自訂 CSS 提升介面質感
+# 自訂 CSS 質感
 st.markdown("""
 <style>
     .main { background-color: #0b0f19; }
@@ -32,13 +33,18 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# 初始化 Session State (確保紀錄儲存在記憶體中)
-if "trade_history" not in st.session_state:
-    st.session_state.trade_history = pd.DataFrame(columns=[
-        "交易日期", "股票代號/名稱", "操作", "策略週期", "成交價", "數量",
-        "關鍵支撐", "關鍵壓力", "量能型態", "大盤籌碼",
-        "催化劑", "停損價", "停利價", "下單心態", "核心理由"
-    ])
+# 建立 Google Sheets 連線
+conn = st.connection("gsheets", type=GSheetsConnection)
+
+# 讀取試算表資料的函式
+def load_data():
+    try:
+        # ttl=0 表示不快取，每次重新讀取最新資料
+        df = conn.read(ttl=0)
+        return df
+    except Exception as e:
+        st.error(f"無法讀取 Google Sheets，請檢查 secrets 設定。錯誤資訊: {e}")
+        return pd.DataFrame()
 
 # --- 頁頭 Header ---
 st.markdown('<div class="hero-title">📈 股票買賣與每日歷史決策紀錄表</div>', unsafe_allow_html=True)
@@ -50,7 +56,7 @@ tab_new, tab_history = st.tabs(["📝 新增交易決策", "📊 歷史決策總
 # TAB 1: 新增交易決策
 # ==========================================
 with tab_new:
-    st.caption("請填寫當下的交易邏輯與心理狀態，點擊底部提交以儲存至資料庫。")
+    st.caption("請填寫當下的交易邏輯與心理狀態，點擊底部提交以同步儲存至 Google Sheets。")
     
     with st.form(key="trade_entry_form", clear_on_submit=True):
         
@@ -98,36 +104,46 @@ with tab_new:
             core_reason = st.text_area("為什麼「當下」下單？(核心理由)", placeholder="請簡述當下非買/賣不可的核心邏輯...", height=100)
 
         # 提交按鈕
-        submit_button = st.form_submit_button(label="🚀 儲存交易紀錄", use_container_width=True)
+        submit_button = st.form_submit_button(label="🚀 儲存至 Google Sheets 資料庫", use_container_width=True)
         
         if submit_button:
-            new_data = pd.DataFrame([{
-                "交易日期": str(trade_date),
-                "股票代號/名稱": symbol_name,
-                "操作": action_type,
-                "策略週期": strategy_period,
-                "成交價": price,
-                "數量": quantity,
-                "關鍵支撐": support_level,
-                "關鍵壓力": resistance_level,
-                "量能型態": volume_pattern,
-                "大盤籌碼": market_env,
-                "催化劑": catalyst,
-                "停損價": stop_loss,
-                "停利價": take_profit,
-                "下單心態": mindset,
-                "核心理由": core_reason
-            }])
-            st.session_state.trade_history = pd.concat([st.session_state.trade_history, new_data], ignore_index=True)
-            st.success(f"✅ 已成功紀錄【{symbol_name}】的交易決策！請前往「歷史決策總覽」查看。")
+            if not symbol_name:
+                st.warning("⚠️ 請輸入股票代號與名稱！")
+            else:
+                existing_data = load_data()
+                new_entry = pd.DataFrame([{
+                    "交易日期": str(trade_date),
+                    "股票代號/名稱": symbol_name,
+                    "操作": action_type,
+                    "策略週期": strategy_period,
+                    "成交價": price,
+                    "數量": quantity,
+                    "關鍵支撐": support_level,
+                    "關鍵壓力": resistance_level,
+                    "量能型態": volume_pattern,
+                    "大盤籌碼": market_env,
+                    "催化劑": catalyst,
+                    "停損價": stop_loss,
+                    "停利價": take_profit,
+                    "下單心態": mindset,
+                    "核心理由": core_reason
+                }])
+                
+                updated_df = pd.concat([existing_data, new_entry], ignore_index=True)
+                conn.update(data=updated_df)
+                st.success(f"✅ 成功寫入 Google Sheets！【{symbol_name}】紀錄已更新。")
 
 # ==========================================
 # TAB 2: 歷史決策總覽與覆盤
 # ==========================================
 with tab_history:
-    st.markdown("### 📊 歷史紀錄檢視與事後覆盤")
+    st.markdown("### 📊 歷史紀錄檢視（實時同步 Google Sheets）")
     
-    if st.session_state.trade_history.empty:
-        st.info("💡 目前尚無交易紀錄，請先至「📝 新增交易決策」填寫第一筆紀錄。")
+    if st.button("🔄 重新整理資料庫"):
+        st.rerun()
+
+    data = load_data()
+    if data.empty:
+        st.info("💡 目前資料庫為空，請至「📝 新增交易決策」填寫第一筆紀錄。")
     else:
-        st.dataframe(st.session_state.trade_history, use_container_width=True, hide_index=True)
+        st.dataframe(data, use_container_width=True, hide_index=True)
