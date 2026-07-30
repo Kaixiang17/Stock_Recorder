@@ -3,7 +3,7 @@ import pandas as pd
 import requests
 from datetime import datetime
 
-# 頁面配置
+# 1. 頁面基本配置
 st.set_page_config(
     page_title="Stock Recorder | 交易決策與覆盤終端",
     page_icon="📈",
@@ -11,6 +11,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+# 自訂 CSS 質感
 st.markdown("""
 <style>
     .main { background-color: #0b0f19; }
@@ -32,9 +33,23 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# 取得 Secrets 中的 Google Web App API 網址
+# 取得 Secrets 中的設定
 WEB_APP_URL = st.secrets.get("GOOGLE_WEB_APP_URL", "")
+CSV_URL = st.secrets.get("GOOGLE_SHEET_CSV_URL", "")
 
+# 讀取 Google Sheets 最新數據的函式
+@st.cache_data(ttl=5)  # 快取 5 秒，按重新整理即可同步最新資料
+def fetch_sheet_data(url):
+    if not url:
+        return None
+    try:
+        # 強制指定 utf-8 編碼確保中文不亂碼
+        df = pd.read_csv(url, encoding="utf-8")
+        return df
+    except Exception as e:
+        return None
+
+# --- 頁頭 Header ---
 st.markdown('<div class="hero-title">📈 股票買賣與每日歷史決策紀錄表</div>', unsafe_allow_html=True)
 st.markdown('<div class="hero-quote">「歷史不會重複，但總是吟唱著相同的押韻」—— 記錄當下情境，打造專屬交易系統</div>', unsafe_allow_html=True)
 
@@ -117,6 +132,7 @@ with tab_new:
                     res = requests.post(WEB_APP_URL, json=payload)
                     if res.status_code == 200:
                         st.success(f"✅ 成功寫入 Google Sheets！【{symbol_name}】紀錄已更新。")
+                        st.cache_data.clear()  # 清除讀取快取以自動刷出最新資料
                     else:
                         st.error(f"❌ 寫入失敗，HTTP 狀態碼: {res.status_code}")
                 except Exception as e:
@@ -127,6 +143,34 @@ with tab_new:
 # ==========================================
 with tab_history:
     st.markdown("### 📊 歷史紀錄檢視")
-    st.info("💡 提醒：你可以隨時開啟 Google Sheets 直接進行資料刪除、修改與後台維護。")
-    if st.button("🔄 重新整理資料庫"):
-        st.rerun()
+    
+    col_btn, col_info = st.columns([1, 4])
+    with col_btn:
+        if st.button("🔄 重新整理資料庫", use_container_width=True):
+            st.cache_data.clear()
+            st.rerun()
+    with col_info:
+        st.caption("💡 提示：資料與你的 Google 試算表實時連線。若在試算表中新增或修改欄位，點擊重新整理即可同步。")
+    
+    if not CSV_URL:
+        st.warning("⚠️ 請至 Streamlit Secrets 設定 GOOGLE_SHEET_CSV_URL（請參考步驟 1 的發布到網路 CSV 連結）。")
+    else:
+        df_history = fetch_sheet_data(CSV_URL)
+        
+        if df_history is None or df_history.empty:
+            st.info("💡 目前歷史資料庫為空，或者無法讀取 Google Sheets。請先至第一個頁籤填寫新增紀錄。")
+        else:
+            # 搜尋與過濾功能
+            search_term = st.text_input("🔍 搜尋股票代號 / 核心理由關鍵字", "")
+            if search_term:
+                df_history = df_history[
+                    df_history["股票代號/名稱"].astype(str).str.contains(search_term, case=False, na=False) |
+                    df_history["核心理由"].astype(str).str.contains(search_term, case=False, na=False)
+                ]
+            
+            # 展示高階資料表格
+            st.dataframe(
+                df_history,
+                use_container_width=True,
+                hide_index=True
+            )
