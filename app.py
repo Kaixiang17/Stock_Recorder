@@ -1,6 +1,8 @@
 import streamlit as st
 import pandas as pd
 import requests
+import plotly.express as px
+import plotly.graph_objects as go
 from datetime import datetime
 
 # 1. 頁面基本配置
@@ -11,7 +13,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# 自訂 CSS 質感
+# 自訂暗黑金屬質感 CSS
 st.markdown("""
 <style>
     .main { background-color: #0b0f19; }
@@ -30,6 +32,12 @@ st.markdown("""
         font-style: italic;
         margin-bottom: 1.5rem;
     }
+    .metric-card {
+        background-color: #1e293b;
+        padding: 1rem;
+        border-radius: 8px;
+        border: 1px solid #334155;
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -38,15 +46,14 @@ WEB_APP_URL = st.secrets.get("GOOGLE_WEB_APP_URL", "")
 CSV_URL = st.secrets.get("GOOGLE_SHEET_CSV_URL", "")
 
 # 讀取 Google Sheets 最新數據的函式
-@st.cache_data(ttl=5)  # 快取 5 秒，按重新整理即可同步最新資料
+@st.cache_data(ttl=5)
 def fetch_sheet_data(url):
     if not url:
         return None
     try:
-        # 強制指定 utf-8 編碼確保中文不亂碼
         df = pd.read_csv(url, encoding="utf-8")
         return df
-    except Exception as e:
+    except Exception:
         return None
 
 # --- 頁頭 Header ---
@@ -71,8 +78,17 @@ with tab_new:
             action_type = st.selectbox("操作類別", ["買進 (Buy)", "賣出 (Sell)", "加碼 (Add)", "減碼 (Reduce)", "觀察紀錄 (Watch)"])
             strategy_period = st.selectbox("策略週期", ["超短線 (Day Trade)", "波段交易 (Swing)", "趨勢中長線 (Trend)", "長期配置 (Long-term)"])
         with col3:
-            price = st.number_input("成交單價", min_value=0.0, step=0.1, format="%.2f")
+            price = st.number_input("進場/成交單價", min_value=0.0, step=0.1, format="%.2f")
+            exit_price = st.number_input("平倉/目前單價 (選填)", min_value=0.0, step=0.1, format="%.2f", value=0.0)
             quantity = st.number_input("數量 (股/張)", min_value=1, step=1)
+
+        # 動態計算預估損益與報酬率
+        pnl = 0.0
+        roi = 0.0
+        if price > 0 and exit_price > 0:
+            pnl = (exit_price - price) * quantity
+            roi = ((exit_price - price) / price) * 100
+            st.info(f"💡 預計試算結果：單筆損益 **${pnl:,.2f}** | 報酬率 **{roi:+.2f}%**")
 
         st.divider()
 
@@ -125,14 +141,17 @@ with tab_new:
                     "停損價": stop_loss,
                     "停利價": take_profit,
                     "下單心態": mindset,
-                    "核心理由": core_reason
+                    "核心理由": core_reason,
+                    "平倉現價": exit_price,
+                    "損益金額": round(pnl, 2),
+                    "報酬率": round(roi, 2)
                 }
                 
                 try:
                     res = requests.post(WEB_APP_URL, json=payload)
                     if res.status_code == 200:
                         st.success(f"✅ 成功寫入 Google Sheets！【{symbol_name}】紀錄已更新。")
-                        st.cache_data.clear()  # 清除讀取快取以自動刷出最新資料
+                        st.cache_data.clear()
                     else:
                         st.error(f"❌ 寫入失敗，HTTP 狀態碼: {res.status_code}")
                 except Exception as e:
@@ -142,7 +161,7 @@ with tab_new:
 # TAB 2: 歷史決策總覽與覆盤
 # ==========================================
 with tab_history:
-    st.markdown("### 📊 歷史紀錄檢視")
+    st.markdown("### 📊 歷史紀錄與統計驗證")
     
     col_btn, col_info = st.columns([1, 4])
     with col_btn:
@@ -150,27 +169,113 @@ with tab_history:
             st.cache_data.clear()
             st.rerun()
     with col_info:
-        st.caption("💡 提示：資料與你的 Google 試算表實時連線。若在試算表中新增或修改欄位，點擊重新整理即可同步。")
+        st.caption("💡 數據已實時連線。若有欄位填寫不全，可直接前往 Google 試算表補上平倉價與報酬率。")
     
     if not CSV_URL:
-        st.warning("⚠️ 請至 Streamlit Secrets 設定 GOOGLE_SHEET_CSV_URL（請參考步驟 1 的發布到網路 CSV 連結）。")
+        st.warning("⚠️ 請至 Streamlit Secrets 設定 GOOGLE_SHEET_CSV_URL。")
     else:
-        df_history = fetch_sheet_data(CSV_URL)
+        df = fetch_sheet_data(CSV_URL)
         
-        if df_history is None or df_history.empty:
-            st.info("💡 目前歷史資料庫為空，或者無法讀取 Google Sheets。請先至第一個頁籤填寫新增紀錄。")
+        if df is None or df.empty:
+            st.info("💡 目前歷史資料庫為空，請先新增交易紀錄。")
         else:
-            # 搜尋與過濾功能
-            search_term = st.text_input("🔍 搜尋股票代號 / 核心理由關鍵字", "")
+            # --- 數據清理與格式轉換 ---
+            if "交易日期" in df.columns:
+                df["交易日期"] = pd.to_datetime(df["交易日期"]).dt.date
+                df = df.sort_values(by="交易日期")
+            
+            # 確保欄位存在且轉為數值型態
+            for num_col in ["損益金額", "報酬率", "成交價", "平倉現價"]:
+                if num_col in df.columns:
+                    df[num_col] = pd.to_numeric(df[num_col], errors="coerce").fillna(0)
+                else:
+                    df[num_col] = 0.0
+
+            # 累積損益計算（用於繪製資金曲線）
+            df["累積損益"] = df["損益金額"].cumsum()
+
+            # --- 頂部關鍵 KPI 指標 ---
+            m1, m2, m3, m4 = st.columns(4)
+            total_trades = len(df)
+            total_pnl = df["損益金額"].sum()
+            
+            # 勝率計算 (損益金額 > 0)
+            winning_trades = len(df[df["損益金額"] > 0])
+            win_rate = (winning_trades / total_trades * 100) if total_trades > 0 else 0.0
+            avg_roi = df["報酬率"].mean() if total_trades > 0 else 0.0
+
+            m1.metric("總交易筆數", f"{total_trades} 筆")
+            m2.metric("勝率 (Win Rate)", f"{win_rate:.1f}%", f"{winning_trades} 勝 / {total_trades - winning_trades} 負")
+            m3.metric("累積淨損益", f"${total_pnl:,.2f}", delta=f"{total_pnl:,.2f}")
+            m4.metric("平均單筆報酬率", f"{avg_roi:+.2f}%")
+
+            st.divider()
+
+            # --- 視覺化圖表區域 ---
+            st.markdown("### 📈 累積損益資金曲線 (Equity Curve)")
+            
+            fig_equity = px.line(
+                df, 
+                x="交易日期", 
+                y="累積損益", 
+                title="資產權益成長走勢圖 ($)",
+                markers=True,
+                hover_data=["股票代號/名稱", "操作", "報酬率"]
+            )
+            fig_equity.update_traces(line_color="#10b981", line_width=3)
+            fig_equity.update_layout(
+                template="plotly_dark",
+                paper_bgcolor="rgba(0,0,0,0)",
+                plot_bgcolor="rgba(0,0,0,0)",
+                xaxis_title="日期",
+                yaxis_title="累積損益 ($)"
+            )
+            st.plotly_chart(fig_equity, use_container_width=True)
+
+            # 兩欄式圖表分析
+            chart_col1, chart_col2 = st.columns(2)
+            
+            with chart_col1:
+                st.markdown("#### 🎯 策略週期分佈")
+                if "策略週期" in df.columns:
+                    fig_pie = px.pie(
+                        df, 
+                        names="策略週期", 
+                        hole=0.4,
+                        color_discrete_sequence=px.colors.qualitative.Pastel
+                    )
+                    fig_pie.update_layout(template="plotly_dark", paper_bgcolor="rgba(0,0,0,0)")
+                    st.plotly_chart(fig_pie, use_container_width=True)
+
+            with chart_col2:
+                st.markdown("#### 📊 每筆交易報酬率 (%)")
+                fig_bar = px.bar(
+                    df, 
+                    x="股票代號/名稱", 
+                    y="報酬率",
+                    color="報酬率",
+                    color_continuous_scale=["#ef4444", "#94a3b8", "#10b981"],
+                    hover_data=["交易日期", "核心理由"]
+                )
+                fig_bar.update_layout(template="plotly_dark", paper_bgcolor="rgba(0,0,0,0)")
+                st.plotly_chart(fig_bar, use_container_width=True)
+
+            st.divider()
+
+            # --- 搜尋與詳細表格 ---
+            st.markdown("### 📋 歷史明細清單")
+            search_term = st.text_input("🔍 搜尋股票代號 / 核心理由", "")
+            
+            df_display = df.copy()
             if search_term:
-                df_history = df_history[
-                    df_history["股票代號/名稱"].astype(str).str.contains(search_term, case=False, na=False) |
-                    df_history["核心理由"].astype(str).str.contains(search_term, case=False, na=False)
+                df_display = df_display[
+                    df_display["股票代號/名稱"].astype(str).str.contains(search_term, case=False, na=False) |
+                    df_display["核心理由"].astype(str).str.contains(search_term, case=False, na=False)
                 ]
             
-            # 展示高階資料表格
             st.dataframe(
-                df_history,
+                df_display.style.highlight_max(subset=["報酬率"], color="#065f46")
+                                .highlight_min(subset=["報酬率"], color="#991b1b"),
                 use_container_width=True,
                 hide_index=True
             )
