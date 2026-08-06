@@ -49,16 +49,36 @@ def fetch_sheet_data(url):
     except Exception:
         return None
 
-# 自動 FIFO 配對算損益的核心引擎
+# 自動 FIFO 配對算損益的核心引擎（修正 KeyError 防護版）
 def calculate_trade_pnl(df):
     if df is None or df.empty:
         return df
 
-    # 清理基礎型態
-    df["成交價"] = pd.to_numeric(df["成交價"], errors="coerce").fillna(0)
-    df["數量"] = pd.to_numeric(df["数量"].fillna(df.get("數量", 0)), errors="coerce").fillna(0)
-    
-    # 初始化或轉換欄位
+    # 複製一份以防修改原始資料時警告
+    df = df.copy()
+
+    # 1. 彈性抓取「數量」欄位（相容 數量、数量、股數 等命名）
+    qty_col = None
+    for possible_name in ["數量", "数量", "股數", "Quantity", "qty"]:
+        if possible_name in df.columns:
+            qty_col = possible_name
+            break
+            
+    if qty_col:
+        df["數量"] = pd.to_numeric(df[qty_col], errors="coerce").fillna(0)
+    else:
+        df["數量"] = 0.0
+
+    # 2. 彈性抓取「成交價」與「操作」欄位
+    if "成交價" in df.columns:
+        df["成交價"] = pd.to_numeric(df["成交價"], errors="coerce").fillna(0)
+    else:
+        df["成交價"] = 0.0
+
+    if "操作" not in df.columns:
+        df["操作"] = "買進 (Buy)"
+
+    # 3. 初始化或轉換損益欄位
     if "損益金額" not in df.columns:
         df["損益金額"] = 0.0
     if "報酬率" not in df.columns:
@@ -67,32 +87,31 @@ def calculate_trade_pnl(df):
     df["損益金額"] = pd.to_numeric(df["損益金額"], errors="coerce").fillna(0)
     df["報酬率"] = pd.to_numeric(df["報酬率"], errors="coerce").fillna(0)
 
-    # 如果使用者已經在 Google Sheets 寫死了非 0 的損益，就尊重原設定
-    # 否則依買賣類別進行自動計算
-    inventory = {} # 記錄多頭持倉庫存 {symbol: [{'price': p, 'qty': q}]}
+    # 4. FIFO 配對計算
+    inventory = {} # {symbol: [{'price': p, 'qty': q}]}
 
     for idx, row in df.iterrows():
-        symbol = str(row["股票代號/名稱"]).strip()
-        action = str(row["操作"])
-        price = float(row["成交價"])
-        qty = float(row["數量"])
+        symbol = str(row.get("股票代號/名稱", "")).strip()
+        action = str(row.get("操作", ""))
+        price = float(row.get("成交價", 0))
+        qty = float(row.get("數量", 0))
         
-        # 原本欄位已有手動輸入的損益時跳過自動演算
+        # 若原先試算表中已手動輸入非 0 損益則跳過
         if row["損益金額"] != 0:
             continue
 
         if symbol not in inventory:
             inventory[symbol] = []
 
-        if "買進" in action or "Buy" in action or "加碼" in action:
+        if any(keyword in action for keyword in ["買進", "Buy", "加碼"]):
             inventory[symbol].append({'price': price, 'qty': qty})
         
-        elif "賣出" in action or "Sell" in action or "減碼" in action:
+        elif any(keyword in action for keyword in ["賣出", "Sell", "減碼"]):
             sell_qty = qty
             realized_pnl = 0.0
             total_cost = 0.0
 
-            # 從持倉先進先出進行沖銷
+            # 先進先出沖銷成本
             while sell_qty > 0 and len(inventory[symbol]) > 0:
                 buy_batch = inventory[symbol][0]
                 matched_qty = min(sell_qty, buy_batch['qty'])
