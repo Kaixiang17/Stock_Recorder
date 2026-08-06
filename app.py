@@ -49,12 +49,12 @@ def fetch_sheet_data(url):
     except Exception:
         return None
 
-# 自動 FIFO 配對算損益的核心引擎（修正 KeyError 防護版）
+# 自動 FIFO 配對算損益的核心引擎（修正 TypeError 轉型防護版）
 def calculate_trade_pnl(df):
     if df is None or df.empty:
         return df
 
-    # 複製一份以防修改原始資料時警告
+    # 複製一份 DataFrame 以防連動修改
     df = df.copy()
 
     # 1. 彈性抓取「數量」欄位（相容 數量、数量、股數 等命名）
@@ -65,47 +65,47 @@ def calculate_trade_pnl(df):
             break
             
     if qty_col:
-        df["數量"] = pd.to_numeric(df[qty_col], errors="coerce").fillna(0)
+        df["數量"] = pd.to_numeric(df[qty_col], errors="coerce").fillna(0.0).astype(float)
     else:
         df["數量"] = 0.0
 
     # 2. 彈性抓取「成交價」與「操作」欄位
     if "成交價" in df.columns:
-        df["成交價"] = pd.to_numeric(df["成交價"], errors="coerce").fillna(0)
+        df["成交價"] = pd.to_numeric(df["成交價"], errors="coerce").fillna(0.0).astype(float)
     else:
         df["成交價"] = 0.0
 
     if "操作" not in df.columns:
         df["操作"] = "買進 (Buy)"
 
-    # 3. 初始化或轉換損益欄位
-    if "損益金額" not in df.columns:
-        df["損益金額"] = 0.0
-    if "報酬率" not in df.columns:
-        df["報酬率"] = 0.0
-
-    df["損益金額"] = pd.to_numeric(df["損益金額"], errors="coerce").fillna(0)
-    df["報酬率"] = pd.to_numeric(df["報酬率"], errors="coerce").fillna(0)
+    # 3. 強制將「損益金額」與「報酬率」轉為 float64 型態，徹底避免 TypeError
+    df["損益金額"] = pd.to_numeric(df.get("損益金額", 0), errors="coerce").fillna(0.0).astype(float)
+    df["報酬率"] = pd.to_numeric(df.get("報酬率", 0), errors="coerce").fillna(0.0).astype(float)
 
     # 4. FIFO 配對計算
     inventory = {} # {symbol: [{'price': p, 'qty': q}]}
 
-    for idx, row in df.iterrows():
+    for idx in range(len(df)):
+        row = df.iloc[idx]
         symbol = str(row.get("股票代號/名稱", "")).strip()
         action = str(row.get("操作", ""))
-        price = float(row.get("成交價", 0))
-        qty = float(row.get("數量", 0))
+        price = float(row.get("成交價", 0.0))
+        qty = float(row.get("數量", 0.0))
+        current_pnl = float(row.get("損益金額", 0.0))
         
-        # 若原先試算表中已手動輸入非 0 損益則跳過
-        if row["損益金額"] != 0:
+        # 若原先試算表中已手動輸入非 0 損益則跳過自動計算
+        if current_pnl != 0.0:
             continue
 
         if symbol not in inventory:
             inventory[symbol] = []
 
+        # 買進對應邏輯
         if any(keyword in action for keyword in ["買進", "Buy", "加碼"]):
-            inventory[symbol].append({'price': price, 'qty': qty})
+            if qty > 0:
+                inventory[symbol].append({'price': price, 'qty': qty})
         
+        # 賣出對應邏輯
         elif any(keyword in action for keyword in ["賣出", "Sell", "減碼"]):
             sell_qty = qty
             realized_pnl = 0.0
@@ -127,9 +127,10 @@ def calculate_trade_pnl(df):
                 if buy_batch['qty'] <= 0:
                     inventory[symbol].pop(0)
 
-            df.at[idx, "損益金額"] = round(realized_pnl, 2)
+            # 使用 .loc 型態安全賦值
+            df.loc[df.index[idx], "損益金額"] = float(round(realized_pnl, 2))
             if total_cost > 0:
-                df.at[idx, "報酬率"] = round((realized_pnl / total_cost) * 100, 2)
+                df.loc[df.index[idx], "報酬率"] = float(round((realized_pnl / total_cost) * 100, 2))
 
     return df
 
