@@ -49,15 +49,14 @@ def fetch_sheet_data(url):
     except Exception:
         return None
 
-# 自動 FIFO 配對算損益的核心引擎（修正 TypeError 轉型防護版）
+# 自動 FIFO 配對算損益的核心引擎（型態安全防護版）
 def calculate_trade_pnl(df):
     if df is None or df.empty:
         return df
 
-    # 複製一份 DataFrame 以防連動修改
     df = df.copy()
 
-    # 1. 彈性抓取「數量」欄位（相容 數量、数量、股數 等命名）
+    # 1. 彈性抓取「數量」欄位
     qty_col = None
     for possible_name in ["數量", "数量", "股數", "Quantity", "qty"]:
         if possible_name in df.columns:
@@ -78,7 +77,7 @@ def calculate_trade_pnl(df):
     if "操作" not in df.columns:
         df["操作"] = "買進 (Buy)"
 
-    # 3. 強制將「損益金額」與「報酬率」轉為 float64 型態，徹底避免 TypeError
+    # 3. 強制指定 float64 型態，避免 TypeError
     df["損益金額"] = pd.to_numeric(df.get("損益金額", 0), errors="coerce").fillna(0.0).astype(float)
     df["報酬率"] = pd.to_numeric(df.get("報酬率", 0), errors="coerce").fillna(0.0).astype(float)
 
@@ -93,7 +92,7 @@ def calculate_trade_pnl(df):
         qty = float(row.get("數量", 0.0))
         current_pnl = float(row.get("損益金額", 0.0))
         
-        # 若原先試算表中已手動輸入非 0 損益則跳過自動計算
+        # 若試算表已手動寫死非 0 損益則跳過
         if current_pnl != 0.0:
             continue
 
@@ -111,7 +110,7 @@ def calculate_trade_pnl(df):
             realized_pnl = 0.0
             total_cost = 0.0
 
-            # 先進先出沖銷成本
+            # 先進先出對沖
             while sell_qty > 0 and len(inventory[symbol]) > 0:
                 buy_batch = inventory[symbol][0]
                 matched_qty = min(sell_qty, buy_batch['qty'])
@@ -127,7 +126,7 @@ def calculate_trade_pnl(df):
                 if buy_batch['qty'] <= 0:
                     inventory[symbol].pop(0)
 
-            # 使用 .loc 型態安全賦值
+            # loc 安全賦值
             df.loc[df.index[idx], "損益金額"] = float(round(realized_pnl, 2))
             if total_cost > 0:
                 df.loc[df.index[idx], "報酬率"] = float(round((realized_pnl / total_cost) * 100, 2))
@@ -232,14 +231,6 @@ with tab_new:
 with tab_history:
     st.markdown("### 📊 歷史紀錄與統計驗證")
     
-    col_btn, col_info = st.columns([1, 4])
-    with col_btn:
-        if st.button("🔄 重新整理資料庫", use_container_width=True):
-            st.cache_data.clear()
-            st.rerun()
-    with col_info:
-        st.caption("💡 系統已啟用「自動配對演算」：會自動針對賣出單與先前的買進成本算出真實損益與勝率。")
-    
     if not CSV_URL:
         st.warning("⚠️ 請至 Streamlit Secrets 設定 GOOGLE_SHEET_CSV_URL。")
     else:
@@ -248,16 +239,43 @@ with tab_history:
         if raw_df is None or raw_df.empty:
             st.info("💡 目前歷史資料庫為空，請先新增交易紀錄。")
         else:
-            # 依日期排序並計算損益
+            # 依日期排序並進行全域 FIFO 對沖計算
             if "交易日期" in raw_df.columns:
                 raw_df["交易日期"] = pd.to_datetime(raw_df["交易日期"]).dt.date
                 raw_df = raw_df.sort_values(by="交易日期").reset_index(drop=True)
             
-            # 自動計算核心算法
-            df = calculate_trade_pnl(raw_df)
+            # 1. 計算全域正確損益（跨月對沖）
+            df_calculated = calculate_trade_pnl(raw_df)
+            
+            # 2. 建立月份欄位供動態篩選
+            df_calculated["月份"] = pd.to_datetime(df_calculated["交易日期"]).dt.strftime("%Y-%m")
+            available_months = ["全部歷史 (All Time)"] + sorted(list(df_calculated["月份"].unique()), reverse=True)
+
+            # 上方控置列：刷新按鈕與月份選擇器
+            col_filter, col_btn, col_info = st.columns([2, 1, 3])
+            with col_filter:
+                selected_month = st.selectbox("📅 選擇分析月份", available_months)
+            with col_btn:
+                st.write("") # 垂直置中調效
+                st.write("")
+                if st.button("🔄 重新整理", use_container_width=True):
+                    st.cache_data.clear()
+                    st.rerun()
+            with col_info:
+                st.caption("💡 說明：系統先進行全歷史買賣對沖演算，再根據所選月份精準展現當月勝率與已實現損益。")
+
+            st.divider()
+
+            # 3. 根據選取月份過濾資料
+            if selected_month == "全部歷史 (All Time)":
+                df = df_calculated.copy()
+            else:
+                df = df_calculated[df_calculated["月份"] == selected_month].copy()
+
+            # 計算當前檢視範圍的累積損益
             df["累積損益"] = df["損益金額"].cumsum()
 
-            # 只針對「已平倉賣出」的交易去算勝率，評估才精準
+            # 計算統計數字（以平倉賣出單為主）
             sell_trades = df[df["操作"].astype(str).str.contains("賣出|Sell|減碼")]
             total_sells = len(sell_trades)
             winning_trades = len(sell_trades[sell_trades["損益金額"] > 0])
@@ -269,7 +287,7 @@ with tab_history:
 
             # --- 頂部指標面板 ---
             m1, m2, m3, m4 = st.columns(4)
-            m1.metric("總交易筆數", f"{len(df)} 筆", f"已平倉 {total_sells} 筆")
+            m1.metric("當前檢視筆數", f"{len(df)} 筆", f"已平倉 {total_sells} 筆")
             m2.metric("勝率 (Win Rate)", f"{win_rate:.1f}%", f"{winning_trades} 勝 / {losing_trades} 負")
             m3.metric("累積已實現淨損益", f"${total_pnl:,.2f}", delta=f"${total_pnl:,.2f}")
             m4.metric("平均平倉報酬率", f"{avg_roi:+.2f}%")
@@ -277,13 +295,13 @@ with tab_history:
             st.divider()
 
             # --- 資金成長曲線圖 ---
-            st.markdown("### 📈 累積損益資金曲線 (Equity Curve)")
+            st.markdown(f"### 📈 資金成長曲線 - {selected_month}")
             
             fig_equity = px.line(
                 df, 
                 x="交易日期", 
                 y="累積損益", 
-                title="資產權益成長走勢圖 ($)",
+                title=f"資產權益成長走勢圖 ({selected_month})",
                 markers=True,
                 hover_data=["股票代號/名稱", "操作", "成交價", "損益金額", "報酬率"]
             )
@@ -313,7 +331,7 @@ with tab_history:
                     st.plotly_chart(fig_pie, use_container_width=True)
 
             with chart_col2:
-                st.markdown("#### 📊 已平倉單筆報酬率 (%)")
+                st.markdown("#### 📊 單筆平倉報酬率 (%)")
                 if not sell_trades.empty:
                     fig_bar = px.bar(
                         sell_trades, 
@@ -326,7 +344,7 @@ with tab_history:
                     fig_bar.update_layout(template="plotly_dark", paper_bgcolor="rgba(0,0,0,0)")
                     st.plotly_chart(fig_bar, use_container_width=True)
                 else:
-                    st.info("尚無賣出平倉紀錄。")
+                    st.info("當前篩選範圍內無賣出平倉紀錄。")
 
             st.divider()
 
@@ -334,7 +352,7 @@ with tab_history:
             st.markdown("### 📋 歷史明細清單")
             search_term = st.text_input("🔍 搜尋股票代號 / 核心理由", "")
             
-            df_display = df.copy()
+            df_display = df.drop(columns=["月份"], errors="ignore")
             if search_term:
                 df_display = df_display[
                     df_display["股票代號/名稱"].astype(str).str.contains(search_term, case=False, na=False) |
