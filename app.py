@@ -5,7 +5,7 @@ import plotly.express as px
 from datetime import datetime
 
 # ==========================================
-# 1. 頁面基本配置 (全程式只能呼叫一次)
+# 1. 頁面基本配置 (全專案僅此一個)
 # ==========================================
 st.set_page_config(
     page_title="Stock Recorder | 交易覆盤終端",
