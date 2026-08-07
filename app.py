@@ -4,23 +4,19 @@ import requests
 import plotly.express as px
 from datetime import datetime
 
-# 1. 頁面基本配置
+# ==========================================
+# 1. 頁面基本配置 (全程式只能呼叫一次)
+# ==========================================
 st.set_page_config(
-    page_title="Stock Recorder | 交易決策與覆盤終端",
+    page_title="Stock Recorder | 交易覆盤終端",
     page_icon="📈",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# 1. 頁面基本配置
-st.set_page_config(
-    page_title="Stock Recorder | 交易覆盤終端",
-    page_icon="📈",
-    layout="wide",
-    initial_sidebar_state="collapsed"
-)
-
-# 2. 注入 PWA Web App Meta 與 Manifest 設定
+# ==========================================
+# 2. PWA 手機全螢幕 App 相關 Meta 設定
+# ==========================================
 st.markdown("""
     <!-- 啟用 iOS 全螢幕 App 模式 -->
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -34,6 +30,7 @@ st.markdown("""
     <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIlN0b2NrIFJlY29yZGVyIiwKICAic2hvcnRfbmFtZSI6ICJTdG9ja1JlY29yZGVyIiwKICAic3RhcnRfdXJsIjogIi8iLAogICJkaXNwbGF5IjogInN0YW5kYWxvbmUiLAogICJiYWNrZ3JvdW5kX2NvbG9yIjogIiMwYjBmMTkiLAogICJ0aGVtZV9jb2xvciI6ICIjMGIwZjE5IiwKICAiaWNvbnMiOiBbCiAgICB7CiAgICAgICJzcmMiOiAiaHR0cHM6Ly9lbS1jb250ZW50LnpvYmoubmV0L3NvdXJjZS9hcHBsZS8zNTQvY2hhcnQtaW5jcmVhc2luZ18xZjRjOC5wbmciLAogICAgICAic2l6ZXMiOiAiMTkyeDE5MiIsCiAgICAgICJ0eXBlIjogImltYWdlL3BuZyIKICAgIH0KICBdCn0=">
 """, unsafe_allow_html=True)
 
+# 側邊欄：PWA 手機桌面安裝教學
 with st.sidebar.expander("📱 如何將此 App 安裝到手機桌面？"):
     st.markdown("""
     **iPhone (Safari)：**
@@ -46,7 +43,7 @@ with st.sidebar.expander("📱 如何將此 App 安裝到手機桌面？"):
     2. 點擊 **「安裝應用程式」** 或 **「新增至主畫面」**。
     """)
 
-# 自訂 CSS 質感
+# 自訂暗黑金屬質感 CSS
 st.markdown("""
 <style>
     .main { background-color: #0b0f19; }
