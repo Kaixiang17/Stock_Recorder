@@ -12,6 +12,40 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+# 1. 頁面基本配置
+st.set_page_config(
+    page_title="Stock Recorder | 交易覆盤終端",
+    page_icon="📈",
+    layout="wide",
+    initial_sidebar_state="collapsed"
+)
+
+# 2. 注入 PWA Web App Meta 與 Manifest 設定
+st.markdown("""
+    <!-- 啟用 iOS 全螢幕 App 模式 -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="StockRecorder">
+    
+    <!-- 設定 App 圖示 (Icon) -->
+    <link rel="apple-touch-icon" href="https://em-content.zobj.net/source/apple/354/chart-increasing_1f4c8.png">
+    
+    <!-- Web App Manifest (PWA 設定) -->
+    <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIlN0b2NrIFJlY29yZGVyIiwKICAic2hvcnRfbmFtZSI6ICJTdG9ja1JlY29yZGVyIiwKICAic3RhcnRfdXJsIjogIi8iLAogICJkaXNwbGF5IjogInN0YW5kYWxvbmUiLAogICJiYWNrZ3JvdW5kX2NvbG9yIjogIiMwYjBmMTkiLAogICJ0aGVtZV9jb2xvciI6ICIjMGIwZjE5IiwKICAiaWNvbnMiOiBbCiAgICB7CiAgICAgICJzcmMiOiAiaHR0cHM6Ly9lbS1jb250ZW50LnpvYmoubmV0L3NvdXJjZS9hcHBsZS8zNTQvY2hhcnQtaW5jcmVhc2luZ18xZjRjOC5wbmciLAogICAgICAic2l6ZXMiOiAiMTkyeDE5MiIsCiAgICAgICJ0eXBlIjogImltYWdlL3BuZyIKICAgIH0KICBdCn0=">
+""", unsafe_allow_html=True)
+
+with st.sidebar.expander("📱 如何將此 App 安裝到手機桌面？"):
+    st.markdown("""
+    **iPhone (Safari)：**
+    1. 點擊瀏覽器底部的 **「分享」** 按鈕（方框加向上箭頭 ⎋）。
+    2. 向下滾動，點擊 **「加入主畫面」 (Add to Home Screen)**。
+    3. 點擊右上角 **「新增」**，桌面就會出現專屬圖示！
+
+    **Android (Chrome)：**
+    1. 點擊右上角 **「選單」** (三點圖示)。
+    2. 點擊 **「安裝應用程式」** 或 **「新增至主畫面」**。
+    """)
+
 # 自訂 CSS 質感
 st.markdown("""
 <style>
