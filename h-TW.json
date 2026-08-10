@@ -1,0 +1,90 @@
+{
+  "common": {
+    "initializing": "系統初始化中..."
+  },
+  "nav": {
+    "product": "產品特色",
+    "features": "核心功能",
+    "philosophy": "設計理念",
+    "roadmap": "發展路線"
+  },
+  "hero": {
+    "subtitle": "每一筆交易都值得被記錄，每一次決策都值得被分析。",
+    "launchApp": "啟動系統 App",
+    "explore": "探索產品細節"
+  },
+  "showcase": {
+    "journal": {
+      "tag": "結構化交易日誌",
+      "title": "Trade Journal",
+      "desc": "在下單前完整寫下技術型態、催化劑、下單心態與風控計畫，遠離衝動盲目進場。"
+    },
+    "metrics": {
+      "tag": "宏觀與大盤籌碼",
+      "title": "Market Metrics",
+      "desc": "即時觀測市場廣度、領頭賽道與大盤籌碼狀態，確保交易始終順應主要趨勢。"
+    },
+    "analytics": {
+      "tag": "量化績效覆盤",
+      "title": "Performance Analytics",
+      "desc": "自動 FIFO 進出配對算法、資金累積曲線與策略週期勝率統計。"
+    }
+  },
+  "features": {
+    "journal": {
+      "title": "交易日誌",
+      "desc": "即時記錄進場參數、催化劑與心理狀態。"
+    },
+    "metrics": {
+      "title": "大盤指標",
+      "desc": "評估系統性環境，避免逆風強行交易。"
+    },
+    "analytics": {
+      "title": "績效分析",
+      "desc": "自動配對計算真實勝率與資產成長曲線。"
+    },
+    "review": {
+      "title": "歷史覆盤",
+      "desc": "依時間與型態篩選，複製高勝率獲利模型。"
+    }
+  },
+  "philosophy": {
+    "tag": "系統化交易流程",
+    "desc": "Stock Recorder 透過結構化紀錄與歷史覆盤，協助投資人建立可重複執行的良好交易習慣。",
+    "p1": "結構化日誌",
+    "p2": "嚴格風險控制",
+    "p3": "歷史數據覆盤",
+    "p4": "客觀決策流程"
+  },
+  "stats": {
+    "trades": "已記錄交易筆數",
+    "indicators": "大盤指標數據",
+    "strategies": "支援策略類型",
+    "countries": "涵蓋市場國家",
+    "sync": "雲端同步"
+  },
+  "roadmap": {
+    "tag": "產品發展藍圖",
+    "title": "持續演進與升級",
+    "completed": {
+      "title": "已完成功能",
+      "i1": "結構化交易日誌",
+      "i2": "FIFO 損益演算法",
+      "i3": "市場大盤指標",
+      "i4": "Google Sheets 自動同步",
+      "i5": "PWA 手機全螢幕支援"
+    },
+    "upcoming": {
+      "title": "開發中規劃",
+      "i1": "投資組合進階分析",
+      "i2": "AI 覆盤決策診斷",
+      "i3": "歷史交易情境重放",
+      "i4": "AI 專屬交易教練"
+    }
+  },
+  "footer": {
+    "privacy": "隱私權政策",
+    "terms": "服務條款",
+    "copyright": "© 2026 Stock Recorder. All rights reserved."
+  }
+}
