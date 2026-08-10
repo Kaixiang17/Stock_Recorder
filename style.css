@@ -1,0 +1,63 @@
+/* Custom SaaS Glassmorphic & Animations */
+
+/* 科技感背景格線與微脈衝 */
+.tech-bg {
+    background-image: 
+        radial-gradient(ellipse at 50% 0%, rgba(16, 185, 129, 0.12), transparent 70%),
+        radial-gradient(ellipse at 80% 50%, rgba(6, 182, 212, 0.08), transparent 50%),
+        linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 0),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.015) 1px, transparent 0);
+    background-size: 100% 100%, 100% 100%, 48px 48px, 48px 48px;
+}
+
+/* 玻璃擬態 */
+.glass-panel {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.025) 0%, rgba(15, 23, 42, 0.6) 100%);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+}
+
+/* 漸層文字 */
+.text-gradient-apple {
+    background: linear-gradient(180deg, #ffffff 0%, #94a3b8 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* 飄浮光暈動態 */
+@keyframes floatGradient {
+    0%, 100% { transform: translateY(0px) scale(1); }
+    50% { transform: translateY(-30px) scale(1.08); }
+}
+
+.floating-gradient {
+    animation: floatGradient 12s ease-in-out infinite;
+}
+
+.floating-gradient-delay {
+    animation: floatGradient 15s ease-in-out infinite 3s;
+}
+
+/* 浮動卡片 */
+.floating-card {
+    transition: transform 0.2s ease-out;
+}
+
+/* Hover Glow 效果 */
+.hover-glow:hover {
+    border-color: rgba(16, 185, 129, 0.3) !important;
+    box-shadow: 0 0 30px rgba(16, 185, 129, 0.12);
+}
+
+/* Hover Zoom 容器 */
+.hover-zoom-container {
+    overflow: hidden;
+}
+
+.hover-zoom {
+    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.hover-zoom-container:hover .hover-zoom {
+    transform: scale(1.04);
+}
