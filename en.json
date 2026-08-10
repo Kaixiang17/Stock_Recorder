@@ -1,0 +1,90 @@
+{
+  "common": {
+    "initializing": "Initializing System..."
+  },
+  "nav": {
+    "product": "Product",
+    "features": "Features",
+    "philosophy": "Philosophy",
+    "roadmap": "Roadmap"
+  },
+  "hero": {
+    "subtitle": "Every trade deserves to be recorded. Every decision deserves to be analyzed.",
+    "launchApp": "Launch App",
+    "explore": "Explore Features"
+  },
+  "showcase": {
+    "journal": {
+      "tag": "STRUCTURED JOURNALING",
+      "title": "Trade Journal",
+      "desc": "Record context, catalysts, mindset, technical patterns, and exit plans before pulling the trigger."
+    },
+    "metrics": {
+      "tag": "MACRO & BREADTH",
+      "title": "Market Metrics",
+      "desc": "Track market breadth, sector leadership, and systemic sentiment to ensure alignment with major trends."
+    },
+    "analytics": {
+      "tag": "QUANTITATIVE REVIEW",
+      "title": "Performance Analytics",
+      "desc": "Automated FIFO loss/win calculations, equity curves, and strategy distribution metrics."
+    }
+  },
+  "features": {
+    "journal": {
+      "title": "Trade Journal",
+      "desc": "Log precise entry parameters, catalysts, and emotional discipline levels in real-time."
+    },
+    "metrics": {
+      "title": "Market Metrics",
+      "desc": "Evaluate systemic environment indicators to avoid trading against major macro headwinds."
+    },
+    "analytics": {
+      "title": "Performance Analytics",
+      "desc": "Automatic FIFO matching to evaluate true win rates, ROI per trade, and capital equity growth."
+    },
+    "review": {
+      "title": "Historical Review",
+      "desc": "Filter records by timeframe and setup criteria to refine and repeat high-probability setups."
+    }
+  },
+  "philosophy": {
+    "tag": "SYSTEMATIC PROCESS",
+    "desc": "Stock Recorder helps investors build repeatable trading habits through structured journaling and historical review.",
+    "p1": "Structured Journaling",
+    "p2": "Risk Management",
+    "p3": "Historical Review",
+    "p4": "Decision Process"
+  },
+  "stats": {
+    "trades": "Trades Recorded",
+    "indicators": "Market Indicators",
+    "strategies": "Trading Strategies",
+    "countries": "Countries Supported",
+    "sync": "Cloud Sync"
+  },
+  "roadmap": {
+    "tag": "PRODUCT ROADMAP",
+    "title": "Continuous Evolution",
+    "completed": {
+      "title": "Completed",
+      "i1": "Trading Journal",
+      "i2": "FIFO Analytics",
+      "i3": "Market Metrics",
+      "i4": "Google Sheets Sync",
+      "i5": "PWA Support"
+    },
+    "upcoming": {
+      "title": "Coming Soon",
+      "i1": "Portfolio Analytics",
+      "i2": "AI Review & Insights",
+      "i3": "Trade Replay",
+      "i4": "AI Trade Coach"
+    }
+  },
+  "footer": {
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service",
+    "copyright": "© 2026 Stock Recorder. All rights reserved."
+  }
+}s
