@@ -4,6 +4,7 @@
   },
   "nav": {
     "product": "Product",
+    "history": "Market Memory",
     "features": "Features",
     "philosophy": "Philosophy",
     "roadmap": "Roadmap"
@@ -28,6 +29,23 @@
       "tag": "QUANTITATIVE REVIEW",
       "title": "Performance Analytics",
       "desc": "Automated FIFO loss/win calculations, equity curves, and strategy distribution metrics."
+    }
+  },
+  "history": {
+    "tag": "MARKET MEMORY & HISTORY",
+    "title": "History Doesn't Repeat, But It Rhymes",
+    "subtitle": "Markets cycle through euphoria and panic. Traders who record their decision context survive and compound.",
+    "e1": {
+      "title": "Valuation & Bubble Resets",
+      "desc": "Euphoria blinds investors to business fundamentals. Journaling maintains discipline when markets decouple from reality."
+    },
+    "e2": {
+      "title": "Liquidity Crisis & Capitulation",
+      "desc": "Extreme panic creates rare generational entry points. Pre-planned risk boundaries prevent emotional selling at the bottom."
+    },
+    "e3": {
+      "title": "Paradigm Shift Super-Cycles",
+      "desc": "Rapid momentum demands structured exit rules. Recording trade setups ensures riding trends without chasing FOMO."
     }
   },
   "features": {
