@@ -1,275 +1,346 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html lang="zh-TW" class="dark scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trading Journal | 美股歷史覆盤與科技量化決策系統</title>
+    <title>Stock Recorder | Personal Trading Intelligence Platform</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Personal Trading Intelligence Platform. Structured journaling, FIFO analytics, and risk management built for disciplined traders.">
+    <meta name="keywords" content="Trading Journal, Stock Recorder, Trade Review, Portfolio Analytics, Trading Discipline, Risk Management">
+    <meta name="author" content="Kai">
+    <meta name="theme-color" content="#0b0f19">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://kaixiang17.github.io/Stock_Recorder/">
+    <link rel="icon" type="image/png" href="https://em-content.zobj.net/source/apple/354/chart-increasing_1f4c8.png">
 
-    <!-- Open Graph (OG) 社群卡片預覽設定 -->
-    <meta property="og:title" content="Trading Journal | 美股歷史覆盤與科技量化決策系統">
-    <meta property="og:description" content="告別衝動下單！紀錄每次買賣當下的技術型態與心理狀態，打造高勝率專屬交易系統。">
+    <!-- OpenGraph / Twitter Cards -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Stock Recorder | Personal Trading Intelligence Platform">
+    <meta property="og:description" content="Every Trade. Every Decision. One Dashboard. Structured journaling for modern investors.">
     <meta property="og:image" content="https://em-content.zobj.net/source/apple/354/chart-increasing_1f4c8.png">
     <meta property="og:url" content="https://kaixiang17.github.io/Stock_Recorder/">
     <meta name="twitter:card" content="summary_large_image">
 
-    <!-- Tailwind CSS -->
+    <!-- Tailwind CSS CDN & AOS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- AOS CSS (滾動動畫庫) -->
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-    <!-- FontAwesome 圖示庫 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <style>
-        body {
-            background-color: #050811;
-            color: #e2e8f0;
-            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
-            overflow-x: hidden;
-        }
-
-        /* 玻璃擬態與脈衝光暈 */
-        .glass-panel {
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.03) 0%, rgba(15, 23, 42, 0.65) 100%);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
-        }
-        .glass-panel:hover {
-            border-color: rgba(16, 185, 129, 0.3);
-            box-shadow: 0 0 30px rgba(16, 185, 129, 0.15);
-        }
-
-        /* 漸層文字 */
-        .text-gradient-green {
-            background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .text-gradient-cyan {
-            background: linear-gradient(135deg, #06b6d4 0%, #38bdf8 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .text-gradient-gold {
-            background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .text-gradient-apple {
-            background: linear-gradient(180deg, #ffffff 0%, #94a3b8 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        /* 美股動態跑馬燈 */
-        @keyframes ticker {
-            0% { transform: translate3d(0, 0, 0); }
-            100% { transform: translate3d(-50%, 0, 0); }
-        }
-        .ticker-wrap {
-            width: 100%;
-            overflow: hidden;
-            background: rgba(5, 8, 17, 0.9);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-        }
-        .ticker-move {
-            display: inline-flex;
-            white-space: nowrap;
-            animation: ticker 25s linear infinite;
-        }
-
-        /* 科技感交錯雷射背景 */
-        .tech-bg {
-            background-image: 
-                radial-gradient(ellipse at 50% 0%, rgba(16, 185, 129, 0.18), transparent 70%),
-                radial-gradient(ellipse at 80% 50%, rgba(6, 182, 212, 0.12), transparent 50%),
-                linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 0),
-                linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 0);
-            background-size: 100% 100%, 100% 100%, 40px 40px, 40px 40px;
-        }
-
-        .pulse-glow {
-            box-shadow: 0 0 50px -10px rgba(16, 185, 129, 0.35);
-        }
-    </style>
+    
+    <!-- Custom Style Sheet -->
+    <link rel="stylesheet" href="style.css">
 </head>
-<body class="antialiased tech-bg">
+<body class="bg-[#050811] text-slate-200 antialiased selection:bg-emerald-500 selection:text-slate-950 min-h-screen overflow-x-hidden">
 
-    <!-- 1. 美股即時行情跑馬燈 -->
-    <div class="ticker-wrap py-2.5 fixed top-0 w-full z-40 backdrop-blur-md">
-        <div class="ticker-move text-xs font-mono tracking-wider">
-            <span class="mx-6"><strong class="text-slate-200">NVDA</strong> <span class="text-emerald-400">▲ $128.50 (+3.42%)</span></span>
-            <span class="mx-6"><strong class="text-slate-200">NASDAQ</strong> <span class="text-emerald-400">▲ 17,850.20 (+1.25%)</span></span>
-            <span class="mx-6"><strong class="text-slate-200">S&P 500</strong> <span class="text-emerald-400">▲ 5,580.40 (+0.82%)</span></span>
-            <span class="mx-6"><strong class="text-slate-200">AAPL</strong> <span class="text-emerald-400">▲ $224.30 (+1.15%)</span></span>
-            <span class="mx-6"><strong class="text-slate-200">TSLA</strong> <span class="text-rose-400">▼ $248.20 (-1.80%)</span></span>
-            <!-- 循環組 -->
-            <span class="mx-6"><strong class="text-slate-200">NVDA</strong> <span class="text-emerald-400">▲ $128.50 (+3.42%)</span></span>
-            <span class="mx-6"><strong class="text-slate-200">NASDAQ</strong> <span class="text-emerald-400">▲ 17,850.20 (+1.25%)</span></span>
-            <span class="mx-6"><strong class="text-slate-200">S&P 500</strong> <span class="text-emerald-400">▲ $555.40 (+0.82%)</span></span>
+    <!-- Top Loading Overlay -->
+    <div id="loading-screen" class="fixed inset-0 z-50 bg-[#050811] flex flex-col items-center justify-center transition-opacity duration-700">
+        <div class="text-2xl font-bold tracking-tight text-white mb-2 font-mono flex items-center gap-2">
+            <span class="w-3 h-3 rounded-full bg-emerald-400 animate-pulse"></span>
+            Stock Recorder
         </div>
+        <p class="text-xs font-mono text-slate-500 uppercase tracking-widest" data-i18n="common.initializing">Initializing System...</p>
     </div>
 
-    <!-- 2. Hero 主視覺 -->
-    <section class="min-h-screen flex flex-col justify-center items-center text-center px-6 relative pt-24 pb-16">
-        <div data-aos="fade-down" data-aos-duration="1000" class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-mono text-xs mb-8">
-            <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
-            HISTORICAL TRADING & DECISION SYSTEM
-        </div>
-        
-        <h1 data-aos="zoom-in" data-aos-duration="1200" class="text-5xl md:text-8xl font-black text-gradient-apple mb-6 tracking-tight leading-none">
-            歷史不會重複，<br><span class="text-gradient-green">但總是以相同的韻律響起。</span>
-        </h1>
-        
-        <p data-aos="fade-up" data-aos-delay="200" class="text-slate-400 max-w-3xl text-lg md:text-2xl font-light mb-12 leading-relaxed">
-            告別盲目憑感覺下單。紀錄每一次買賣當下的技術型態、催化劑與心理狀態，將歷史的經驗轉化為下一次決策的確定性。
-        </p>
+    <!-- Scroll Progress Bar -->
+    <div id="scroll-progress" class="fixed top-0 left-0 h-[2px] bg-gradient-to-r from-emerald-500 via-cyan-400 to-indigo-500 z-50 transition-all duration-150"></div>
 
-        <div data-aos="fade-up" data-aos-delay="400" class="flex flex-col sm:flex-row gap-5 w-full sm:w-auto justify-center">
-            <a href="https://stockrecorder-wb49zcrpffjtm7fe95ntdn.streamlit.app/" target="_blank" class="px-10 py-5 rounded-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-lg transition-all duration-300 pulse-glow flex items-center justify-center gap-3">
-                <i class="fa-solid fa-terminal"></i> 啟動交易覆盤 App
-            </a>
-            <button onclick="document.getElementById('pwa-modal').classList.remove('hidden')" class="px-8 py-5 rounded-full bg-slate-900/80 hover:bg-white/10 text-emerald-400 font-medium text-base transition-all duration-300 border border-emerald-500/30 flex items-center justify-center gap-2">
-                <i class="fa-solid fa-mobile-screen-button"></i> 手機加到主畫面教學
-            </button>
-            <a href="#why-journaling" class="px-8 py-5 rounded-full bg-slate-900/80 hover:bg-white/10 text-white font-medium text-base transition-all duration-300 border border-slate-800 flex items-center justify-center gap-3">
-                <i class="fa-solid fa-book-bookmark"></i> 為什麼要紀錄？
-            </a>
-        </div>
-
-        <div class="mt-20 animate-bounce text-slate-500 text-xs font-mono tracking-widest uppercase flex items-center gap-2">
-            <i class="fa-solid fa-chevron-down text-emerald-400"></i> 向下滑動探索覆盤聖杯
-        </div>
-    </section>
-
-    <!-- PWA 安裝教學彈窗 Modal -->
-    <div id="pwa-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
-        <div class="glass-panel p-8 rounded-3xl max-w-md w-full border border-emerald-500/30 text-left relative">
-            <button onclick="document.getElementById('pwa-modal').classList.add('hidden')" class="absolute top-4 right-4 text-slate-400 hover:text-white text-xl">✕</button>
-            <h3 class="text-xl font-bold text-white mb-4 flex items-center gap-2">
-                <i class="fa-solid fa-download text-emerald-400"></i> 將 App 安裝至手機桌面
-            </h3>
-            <div class="space-y-4 text-sm text-slate-300">
-                <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800">
-                    <p class="font-bold text-emerald-400 mb-1">📱 iOS (Safari)：</p>
-                    <ol class="list-decimal list-inside space-y-1 text-slate-400 text-xs">
-                        <li>點擊 Safari 底部的「分享」按鈕 <i class="fa-solid fa-share-nodes"></i></li>
-                        <li>向下滾動，點擊「加入主畫面」 (Add to Home)</li>
-                        <li>點擊右上角「新增」即完成安裝！</li>
-                    </ol>
-                </div>
-                <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800">
-                    <p class="font-bold text-cyan-400 mb-1">🤖 Android (Chrome)：</p>
-                    <ol class="list-decimal list-inside space-y-1 text-slate-400 text-xs">
-                        <li>點擊右上方選單點選「三點圖示」</li>
-                        <li>點擊「新增至主畫面」或「安裝應用程式」</li>
-                    </ol>
-                </div>
-            </div>
-            <a href="https://stockrecorder-wb49zcrpffjtm7fe95ntdn.streamlit.app/" target="_blank" class="mt-6 w-full py-3 bg-emerald-500 text-slate-950 font-bold rounded-xl text-center block">
-                開啟 App 並開始安裝
-            </a>
-        </div>
+    <!-- Background Laser Grid & Floating Gradients -->
+    <div class="fixed inset-0 pointer-events-none z-0 tech-bg">
+        <div class="absolute top-0 left-1/4 w-[500px] h-[500px] bg-emerald-500/10 rounded-full blur-[120px] floating-gradient"></div>
+        <div class="absolute top-1/3 right-10 w-[400px] h-[400px] bg-cyan-500/10 rounded-full blur-[100px] floating-gradient-delay"></div>
     </div>
 
-    <!-- 3. 新增高亮區塊：為什麼「每日紀錄與覆盤」是唯一獲利聖杯？ -->
-    <section id="why-journaling" class="max-w-6xl mx-auto px-6 py-24" data-aos="fade-up">
-        <div class="text-center mb-16">
-            <span class="text-xs font-mono text-emerald-400 tracking-widest uppercase">[ THE POWER OF JOURNALING ]</span>
-            <h2 class="text-3xl md:text-5xl font-extrabold text-gradient-apple mt-2 mb-4">為什麼 90% 的人重複犯錯，而 10% 的人持續獲利？</h2>
-            <p class="text-slate-400 max-w-2xl mx-auto">「大腦的記憶是不可靠的。下單當下的貪婪與恐慌，往往在平倉後被記憶自動淡化。唯有紀錄能還原真實。」</p>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div class="glass-panel p-8 rounded-3xl" data-aos="fade-right" data-aos-delay="100">
-                <div class="w-12 h-12 rounded-2xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xl font-bold mb-6">01</div>
-                <h3 class="text-xl font-bold text-white mb-3">破解 FOMO 衝動陷阱</h3>
-                <p class="text-slate-400 text-sm leading-relaxed">
-                    在表單中強迫自己輸入「為什麼當下下單？」，能讓你在按下買進前冷靜 10 秒，過濾掉 80% 因為大漲急著追入的錯誤決策。
-                </p>
-            </div>
-            <div class="glass-panel p-8 rounded-3xl" data-aos="fade-up" data-aos-delay="200">
-                <div class="w-12 h-12 rounded-2xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center text-xl font-bold mb-6">02</div>
-                <h3 class="text-xl font-bold text-white mb-3">建立專屬「起漲數據庫」</h3>
-                <p class="text-slate-400 text-sm leading-relaxed">
-                    紀錄帶量突破、量縮整理等型態。累積 30 筆紀錄後，你就能透過歷史總覽，找出屬於你勝率最高的可複製獲利模型。
-                </p>
-            </div>
-            <div class="glass-panel p-8 rounded-3xl" data-aos="fade-left" data-aos-delay="300">
-                <div class="w-12 h-12 rounded-2xl bg-amber-500/20 text-gradient-gold flex items-center justify-center text-xl font-bold mb-6">03</div>
-                <h3 class="text-xl font-bold text-white mb-3">嚴格執行風控紀律</h3>
-                <p class="text-slate-400 text-sm leading-relaxed">
-                    預先寫下停損價位與下單心態。當市場走勢不如預期時，依靠當初寫下的紀錄冷靜執行停損，絕不在暴跌中寄望奇蹟。
-                </p>
-            </div>
-        </div>
-    </section>
-
-    <!-- 4. 酷炫滾動時間軸：美股歷史週期的押韻 (Scroll Timeline) -->
-    <section class="max-w-5xl mx-auto px-6 py-24" data-aos="fade-up">
-        <div class="text-center mb-16">
-            <span class="text-xs font-mono text-cyan-400 tracking-widest uppercase">[ HISTORICAL CYCLES ]</span>
-            <h2 class="text-3xl md:text-5xl font-bold text-gradient-apple mt-2">歷史在重複，機會也在重演</h2>
-        </div>
-
-        <div class="space-y-12 relative before:absolute before:inset-0 before:left-8 md:before:left-1/2 before:w-0.5 before:bg-slate-800">
-            <div class="relative flex flex-col md:flex-row items-center justify-between gap-8" data-aos="fade-right">
-                <div class="w-full md:w-1/2 md:text-right pr-0 md:pr-10">
-                    <span class="text-emerald-400 font-mono font-bold text-sm">2000 年 • DOT-COM</span>
-                    <h4 class="text-xl font-bold text-white mt-1">網際網路泡沫與修正</h4>
-                    <p class="text-slate-400 text-xs mt-2 leading-relaxed">泡沫破裂後篩選出真正具備商業壁壘的巨頭，覆盤教我們如何在暴跌中冷靜尋找真金。</p>
-                </div>
-                <div class="w-8 h-8 rounded-full bg-emerald-500 border-4 border-slate-950 shrink-0 z-10 shadow-lg shadow-emerald-500/50"></div>
-                <div class="w-full md:w-1/2 pl-0 md:pl-10"></div>
-            </div>
-
-            <div class="relative flex flex-col md:flex-row items-center justify-between gap-8" data-aos="fade-left">
-                <div class="w-full md:w-1/2 pr-0 md:pr-10"></div>
-                <div class="w-8 h-8 rounded-full bg-cyan-500 border-4 border-slate-950 shrink-0 z-10 shadow-lg shadow-cyan-500/50"></div>
-                <div class="w-full md:w-1/2 pl-0 md:pl-10">
-                    <span class="text-cyan-400 font-mono font-bold text-sm">2008 年 • FINANCIAL CRISIS</span>
-                    <h4 class="text-xl font-bold text-white mt-1">次貸風暴與黃金落底點</h4>
-                    <p class="text-slate-400 text-xs mt-2 leading-relaxed">絕望中誕生牛市。熟悉歷史週期的交易者，在全市場恐慌時把握住了黃金十年起漲點。</p>
-                </div>
-            </div>
-
-            <div class="relative flex flex-col md:flex-row items-center justify-between gap-8" data-aos="fade-right">
-                <div class="w-full md:w-1/2 md:text-right pr-0 md:pr-10">
-                    <span class="text-purple-400 font-mono font-bold text-sm">2024+ 年 • AI REVOLUTION</span>
-                    <h4 class="text-xl font-bold text-white mt-1">生成式 AI 算力主升段</h4>
-                    <p class="text-slate-400 text-xs mt-2 leading-relaxed">輝達（NVDA）與晶片股大爆發。系統化覆盤讓你第一時間鎖定主升段起漲訊號。</p>
-                </div>
-                <div class="w-8 h-8 rounded-full bg-purple-500 border-4 border-slate-950 shrink-0 z-10 shadow-lg shadow-purple-500/50"></div>
-                <div class="w-full md:w-1/2 pl-0 md:pl-10"></div>
-            </div>
-        </div>
-    </section>
-
-    <!-- 5. 最終 Call to Action -->
-    <section class="py-28 bg-gradient-to-b from-slate-950 to-emerald-950/30 border-t border-slate-800 text-center relative overflow-hidden" data-aos="zoom-in">
-        <div class="max-w-3xl mx-auto px-6 relative z-10">
-            <h2 class="text-4xl md:text-6xl font-black text-white mb-6 tracking-tight">打造專屬於你的<br><span class="text-gradient-green">交易聖杯系統</span></h2>
-            <p class="text-slate-400 text-lg mb-10 font-light">立刻輸入第一筆交易，開啟冷靜、客觀且高勝率的覆盤之路。</p>
-            
-            <a href="https://stockrecorder-wb49zcrpffjtm7fe95ntdn.streamlit.app/" target="_blank" class="inline-flex items-center gap-3 px-10 py-5 rounded-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-xl transition-all pulse-glow">
-                <i class="fa-solid fa-play"></i> 免費開啟 Streamlit 覆盤 App
+    <!-- Navigation Header -->
+    <header class="fixed top-0 w-full z-40 backdrop-blur-md bg-[#050811]/70 border-b border-white/5 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+            <a href="#" class="flex items-center gap-2.5 font-bold text-lg text-white tracking-tight hover:opacity-80 transition-opacity">
+                <span class="p-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400">
+                    <i class="fa-solid fa-chart-line text-sm"></i>
+                </span>
+                Stock Recorder
             </a>
-        </div>
-    </section>
 
-    <!-- Footer -->
-    <footer class="py-12 text-center text-slate-600 text-xs font-mono border-t border-slate-900">
-        <p>© Stock Recorder System. Focused on Decision Journaling & Historical Cycles.</p>
+            <div class="flex items-center gap-6">
+                <!-- Navigation Links -->
+                <nav class="hidden md:flex items-center gap-8 text-xs font-medium text-slate-400 uppercase tracking-wider">
+                    <a href="#showcase" class="hover:text-white transition-colors" data-i18n="nav.product">Product</a>
+                    <a href="#features" class="hover:text-white transition-colors" data-i18n="nav.features">Features</a>
+                    <a href="#philosophy" class="hover:text-white transition-colors" data-i18n="nav.philosophy">Philosophy</a>
+                    <a href="#roadmap" class="hover:text-white transition-colors" data-i18n="nav.roadmap">Roadmap</a>
+                </nav>
+
+                <!-- Language Switcher & Controls -->
+                <div class="flex items-center gap-4 border-l border-white/10 pl-6">
+                    <button id="lang-toggle" aria-label="Toggle Language" class="text-xs font-mono px-2.5 py-1 rounded-md bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 transition-all flex items-center gap-1.5">
+                        <i class="fa-solid fa-globe text-emerald-400"></i>
+                        <span id="current-lang">繁中</span>
+                    </button>
+                    
+                    <a href="https://stockrecorder-wb49zcrpffjtm7fe95ntdn.streamlit.app/" target="_blank" rel="noopener" class="hidden sm:inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs transition-all shadow-lg shadow-emerald-500/20">
+                        <span data-i18n="hero.launchApp">Launch App</span>
+                        <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="relative z-10">
+        <!-- Section 1: Hero -->
+        <section class="min-h-screen flex items-center justify-center pt-24 pb-16 px-6 max-w-7xl mx-auto">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center w-full">
+                <!-- Hero Text (Left) -->
+                <div class="lg:col-span-5 text-left" data-aos="fade-right">
+                    <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-mono text-xs mb-6">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                        Stock Recorder V2
+                    </div>
+                    <h1 class="text-4xl sm:text-6xl font-extrabold text-white tracking-tight leading-[1.1] mb-4">
+                        Every Trade.<br>
+                        Every Decision.<br>
+                        <span class="text-gradient-apple">One Dashboard.</span>
+                    </h1>
+                    <p class="text-slate-400 text-sm sm:text-base font-normal leading-relaxed mb-8 max-w-lg" data-i18n="hero.subtitle">
+                        每一筆交易都值得被記錄，每一次決策都值得被分析。
+                    </p>
+
+                    <div class="flex flex-wrap items-center gap-4">
+                        <a href="https://stockrecorder-wb49zcrpffjtm7fe95ntdn.streamlit.app/" target="_blank" rel="noopener" class="px-7 py-3.5 rounded-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-sm transition-all flex items-center gap-2 shadow-xl shadow-emerald-500/20">
+                            <span data-i18n="hero.launchApp">Launch App</span>
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </a>
+                        <a href="#showcase" class="px-6 py-3.5 rounded-full bg-slate-900/80 hover:bg-white/10 text-slate-300 font-medium text-sm border border-white/10 transition-all" data-i18n="hero.explore">
+                            Explore Features
+                        </a>
+                        <a href="https://github.com/kaixiang17/Stock_Recorder" target="_blank" rel="noopener" aria-label="GitHub Repository" class="p-3.5 rounded-full bg-slate-900/80 hover:bg-white/10 text-slate-400 hover:text-white border border-white/10 transition-all">
+                            <i class="fa-brands fa-github text-base"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Hero Dashboard Preview (Right with Parallax) -->
+                <div class="lg:col-span-7" data-aos="fade-left" data-aos-delay="200">
+                    <div id="hero-card" class="glass-panel p-2 sm:p-3 rounded-2xl sm:rounded-3xl border border-white/10 shadow-2xl relative floating-card overflow-hidden">
+                        <div class="flex items-center gap-2 px-3 py-2 border-b border-white/5 bg-slate-950/40 rounded-t-xl mb-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-rose-500/80"></span>
+                            <span class="w-2.5 h-2.5 rounded-full bg-amber-500/80"></span>
+                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500/80"></span>
+                            <span class="text-[10px] font-mono text-slate-500 ml-2">stock-recorder.terminal</span>
+                        </div>
+                        <div class="rounded-xl overflow-hidden bg-[#0a0e1a] border border-white/5">
+                            <img src="https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?auto=format&fit=crop&w=1200&q=80" alt="Stock Recorder Live Terminal Preview" class="w-full h-auto object-cover opacity-90 hover:opacity-100 transition-opacity duration-500" loading="eager">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Scroll Indicator -->
+            <a href="#showcase" aria-label="Scroll down" class="absolute bottom-6 left-1/2 -translate-x-1/2 text-slate-500 hover:text-emerald-400 transition-colors animate-bounce">
+                <i class="fa-solid fa-chevron-down text-sm"></i>
+            </a>
+        </section>
+
+        <!-- Section 2: Product Showcase (Alternating Grid) -->
+        <section id="showcase" class="py-24 max-w-7xl mx-auto px-6 border-t border-white/5">
+            <div class="space-y-32">
+                <!-- Showcase Item 1 -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                    <div class="lg:col-span-5 space-y-4" data-aos="fade-right">
+                        <span class="text-xs font-mono text-emerald-400 uppercase tracking-widest font-semibold" data-i18n="showcase.journal.tag">STRUCTURED JOURNALING</span>
+                        <h2 class="text-3xl font-bold text-white tracking-tight" data-i18n="showcase.journal.title">Trade Journal</h2>
+                        <p class="text-slate-400 text-sm leading-relaxed" data-i18n="showcase.journal.desc">Record context, catalysts, mindset, technical patterns, and exit plans before pulling the trigger.</p>
+                    </div>
+                    <div class="lg:col-span-7" data-aos="fade-left">
+                        <div class="glass-panel p-2 rounded-2xl overflow-hidden hover-zoom-container">
+                            <img src="https://images.unsplash.com/photo-1642543492481-44e81e3914a7?auto=format&fit=crop&w=1000&q=80" alt="Trade Journal UI" class="rounded-xl w-full h-80 object-cover hover-zoom" loading="lazy">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Showcase Item 2 (Reversed) -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                    <div class="lg:col-span-7 order-2 lg:order-1" data-aos="fade-right">
+                        <div class="glass-panel p-2 rounded-2xl overflow-hidden hover-zoom-container">
+                            <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1000&q=80" alt="Market Metrics UI" class="rounded-xl w-full h-80 object-cover hover-zoom" loading="lazy">
+                        </div>
+                    </div>
+                    <div class="lg:col-span-5 order-1 lg:order-2 space-y-4" data-aos="fade-left">
+                        <span class="text-xs font-mono text-cyan-400 uppercase tracking-widest font-semibold" data-i18n="showcase.metrics.tag">MACRO & BREADTH</span>
+                        <h2 class="text-3xl font-bold text-white tracking-tight" data-i18n="showcase.metrics.title">Market Metrics</h2>
+                        <p class="text-slate-400 text-sm leading-relaxed" data-i18n="showcase.metrics.desc">Track market breadth, sector leadership, and systemic sentiment to ensure alignment with major trends.</p>
+                    </div>
+                </div>
+
+                <!-- Showcase Item 3 -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                    <div class="lg:col-span-5 space-y-4" data-aos="fade-right">
+                        <span class="text-xs font-mono text-indigo-400 uppercase tracking-widest font-semibold" data-i18n="showcase.analytics.tag">QUANTITATIVE REVIEW</span>
+                        <h2 class="text-3xl font-bold text-white tracking-tight" data-i18n="showcase.analytics.title">Performance Analytics</h2>
+                        <p class="text-slate-400 text-sm leading-relaxed" data-i18n="showcase.analytics.desc">Automated FIFO loss/win calculations, equity curves, and strategy distribution metrics.</p>
+                    </div>
+                    <div class="lg:col-span-7" data-aos="fade-left">
+                        <div class="glass-panel p-2 rounded-2xl overflow-hidden hover-zoom-container">
+                            <img src="https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?auto=format&fit=crop&w=1000&q=80" alt="Performance Analytics UI" class="rounded-xl w-full h-80 object-cover hover-zoom" loading="lazy">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: Feature Cards -->
+        <section id="features" class="py-24 max-w-7xl mx-auto px-6 border-t border-white/5">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Card 1 -->
+                <div class="glass-panel p-6 rounded-2xl border border-white/5 hover-glow transition-all duration-300 group" data-aos="fade-up" data-aos-delay="100">
+                    <div class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-pen-to-square text-base"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-white mb-2" data-i18n="features.journal.title">Trade Journal</h3>
+                    <p class="text-slate-400 text-xs leading-relaxed" data-i18n="features.journal.desc">Log precise entry parameters, catalysts, and emotional discipline levels in real-time.</p>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="glass-panel p-6 rounded-2xl border border-white/5 hover-glow transition-all duration-300 group" data-aos="fade-up" data-aos-delay="200">
+                    <div class="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-chart-pie text-base"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-white mb-2" data-i18n="features.metrics.title">Market Metrics</h3>
+                    <p class="text-slate-400 text-xs leading-relaxed" data-i18n="features.metrics.desc">Evaluate systemic environment indicators to avoid trading against major macro headwinds.</p>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="glass-panel p-6 rounded-2xl border border-white/5 hover-glow transition-all duration-300 group" data-aos="fade-up" data-aos-delay="300">
+                    <div class="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-chart-line text-base"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-white mb-2" data-i18n="features.analytics.title">Performance Analytics</h3>
+                    <p class="text-slate-400 text-xs leading-relaxed" data-i18n="features.analytics.desc">Automatic FIFO matching to evaluate true win rates, ROI per trade, and capital equity growth.</p>
+                </div>
+
+                <!-- Card 4 -->
+                <div class="glass-panel p-6 rounded-2xl border border-white/5 hover-glow transition-all duration-300 group" data-aos="fade-up" data-aos-delay="400">
+                    <div class="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-clock-rotate-left text-base"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-white mb-2" data-i18n="features.review.title">Historical Review</h3>
+                    <p class="text-slate-400 text-xs leading-relaxed" data-i18n="features.review.desc">Filter records by timeframe and setup criteria to refine and repeat high-probability setups.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 4: Why Stock Recorder (Brand Philosophy) -->
+        <section id="philosophy" class="py-24 max-w-5xl mx-auto px-6 border-t border-white/5 text-center">
+            <div data-aos="fade-up">
+                <span class="text-xs font-mono text-emerald-400 uppercase tracking-widest font-semibold mb-3 block" data-i18n="philosophy.tag">SYSTEMATIC PROCESS</span>
+                <h2 class="text-3xl sm:text-5xl font-extrabold text-white tracking-tight mb-6">
+                    Markets change.<br>
+                    <span class="text-gradient-apple">Good decisions don’t.</span>
+                </h2>
+                <p class="text-slate-400 text-base sm:text-lg max-w-2xl mx-auto font-light leading-relaxed mb-12" data-i18n="philosophy.desc">
+                    Stock Recorder helps investors build repeatable trading habits through structured journaling and historical review.
+                </p>
+
+                <!-- 4 Pill Pillars -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-3xl mx-auto">
+                    <div class="p-4 rounded-xl bg-white/5 border border-white/5 text-xs font-mono text-slate-300 font-semibold" data-i18n="philosophy.p1">Structured Journaling</div>
+                    <div class="p-4 rounded-xl bg-white/5 border border-white/5 text-xs font-mono text-slate-300 font-semibold" data-i18n="philosophy.p2">Risk Management</div>
+                    <div class="p-4 rounded-xl bg-white/5 border border-white/5 text-xs font-mono text-slate-300 font-semibold" data-i18n="philosophy.p3">Historical Review</div>
+                    <div class="p-4 rounded-xl bg-white/5 border border-white/5 text-xs font-mono text-slate-300 font-semibold" data-i18n="philosophy.p4">Decision Process</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 5: Animated Statistics -->
+        <section class="py-20 border-t border-b border-white/5 bg-slate-950/40">
+            <div class="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-5 gap-8 text-center">
+                <div data-aos="fade-up" data-aos-delay="100">
+                    <div class="text-3xl sm:text-4xl font-extrabold font-mono text-emerald-400 mb-1 counter" data-target="15000">0</div>
+                    <div class="text-xs font-mono text-slate-400 uppercase tracking-wider" data-i18n="stats.trades">Trades Recorded</div>
+                </div>
+                <div data-aos="fade-up" data-aos-delay="200">
+                    <div class="text-3xl sm:text-4xl font-extrabold font-mono text-cyan-400 mb-1 counter" data-target="24">0</div>
+                    <div class="text-xs font-mono text-slate-400 uppercase tracking-wider" data-i18n="stats.indicators">Market Indicators</div>
+                </div>
+                <div data-aos="fade-up" data-aos-delay="300">
+                    <div class="text-3xl sm:text-4xl font-extrabold font-mono text-indigo-400 mb-1 counter" data-target="8">0</div>
+                    <div class="text-xs font-mono text-slate-400 uppercase tracking-wider" data-i18n="stats.strategies">Trading Strategies</div>
+                </div>
+                <div data-aos="fade-up" data-aos-delay="400">
+                    <div class="text-3xl sm:text-4xl font-extrabold font-mono text-purple-400 mb-1 counter" data-target="12">0</div>
+                    <div class="text-xs font-mono text-slate-400 uppercase tracking-wider" data-i18n="stats.countries">Countries Supported</div>
+                </div>
+                <div data-aos="fade-up" data-aos-delay="500" class="col-span-2 md:col-span-1">
+                    <div class="text-3xl sm:text-4xl font-extrabold font-mono text-amber-400 mb-1">100%</div>
+                    <div class="text-xs font-mono text-slate-400 uppercase tracking-wider" data-i18n="stats.sync">Cloud Sync</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 6: Roadmap Timeline -->
+        <section id="roadmap" class="py-24 max-w-5xl mx-auto px-6 border-t border-white/5">
+            <div class="text-center mb-16" data-aos="fade-up">
+                <span class="text-xs font-mono text-cyan-400 uppercase tracking-widest font-semibold block mb-2" data-i18n="roadmap.tag">PRODUCT ROADMAP</span>
+                <h2 class="text-3xl font-bold text-white tracking-tight" data-i18n="roadmap.title">Continuous Evolution</h2>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Completed -->
+                <div class="glass-panel p-8 rounded-3xl border border-emerald-500/20" data-aos="fade-right">
+                    <div class="flex items-center gap-2 mb-6">
+                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
+                        <h3 class="text-lg font-bold text-white" data-i18n="roadmap.completed.title">Completed</h3>
+                    </div>
+                    <ul class="space-y-3 text-xs font-mono text-slate-300">
+                        <li class="flex items-center gap-2.5"><i class="fa-solid fa-check text-emerald-400"></i> <span data-i18n="roadmap.completed.i1">Trading Journal</span></li>
+                        <li class="flex items-center gap-2.5"><i class="fa-solid fa-check text-emerald-400"></i> <span data-i18n="roadmap.completed.i2">FIFO Analytics</span></li>
+                        <li class="flex items-center gap-2.5"><i class="fa-solid fa-check text-emerald-400"></i> <span data-i18n="roadmap.completed.i3">Market Metrics</span></li>
+                        <li class="flex items-center gap-2.5"><i class="fa-solid fa-check text-emerald-400"></i> <span data-i18n="roadmap.completed.i4">Google Sheets Sync</span></li>
+                        <li class="flex items-center gap-2.5"><i class="fa-solid fa-check text-emerald-400"></i> <span data-i18n="roadmap.completed.i5">PWA Support</span></li>
+                    </ul>
+                </div>
+
+                <!-- Coming Soon -->
+                <div class="glass-panel p-8 rounded-3xl border border-indigo-500/20 opacity-90" data-aos="fade-left">
+                    <div class="flex items-center gap-2 mb-6">
+                        <span class="w-2.5 h-2.5 rounded-full bg-indigo-400 animate-pulse"></span>
+                        <h3 class="text-lg font-bold text-white" data-i18n="roadmap.upcoming.title">Coming Soon</h3>
+                    </div>
+                    <ul class="space-y-3 text-xs font-mono text-slate-400">
+                        <li class="flex items-center gap-2.5"><i class="fa-solid fa-hourglass-half text-indigo-400"></i> <span data-i18n="roadmap.upcoming.i1">Portfolio Analytics</span></li>
+                        <li class="flex items-center gap-2.5"><i class="fa-solid fa-hourglass-half text-indigo-400"></i> <span data-i18n="roadmap.upcoming.i2">AI Review & Insights</span></li>
+                        <li class="flex items-center gap-2.5"><i class="fa-solid fa-hourglass-half text-indigo-400"></i> <span data-i18n="roadmap.upcoming.i3">Trade Replay</span></li>
+                        <li class="flex items-center gap-2.5"><i class="fa-solid fa-hourglass-half text-indigo-400"></i> <span data-i18n="roadmap.upcoming.i4">AI Trade Coach</span></li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Section 7: Footer -->
+    <footer class="py-12 border-t border-white/5 bg-[#03050a] text-slate-500 text-xs font-mono">
+        <div class="max-w-7xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-6">
+            <div class="flex items-center gap-4">
+                <span>Stock Recorder v2.0</span>
+                <span>•</span>
+                <a href="https://github.com/kaixiang17/Stock_Recorder" target="_blank" rel="noopener" class="hover:text-white transition-colors">GitHub</a>
+                <span>•</span>
+                <span>Made by Kai</span>
+            </div>
+
+            <div class="flex items-center gap-6">
+                <a href="#" class="hover:text-white transition-colors" data-i18n="footer.privacy">Privacy Policy</a>
+                <a href="#" class="hover:text-white transition-colors" data-i18n="footer.terms">Terms of Service</a>
+            </div>
+
+            <div data-i18n="footer.copyright">
+                © 2026 Stock Recorder. All rights reserved.
+            </div>
+        </div>
     </footer>
 
-    <!-- AOS 腳本 -->
+    <!-- Scripts -->
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    <script>
-        AOS.init({
-            once: false,
-            mirror: true,
-            duration: 800
-        });
-    </script>
+    <script src="i18n.js"></script>
+    <script src="app.js"></script>
 </body>
 </html>
